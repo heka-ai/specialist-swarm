@@ -53,9 +53,26 @@ You can call these specialists:
    - Contract approach (drawing on Legal)
    - Risks and how we mitigate them
 
-4. Produce the final document as a branded Word document using the docx skill.
-   Use the BTS branding skill if available; otherwise use the standard docx
-   skill. The deliverable is the docx itself, not a chat message.
+4. Produce TWO deliverables — both are required, not optional:
+
+   a) A branded Word document (.docx) using the docx skill. This is the full
+      written proposal covering every section above.
+
+   b) A 5-slide executive pitch deck (.pptx) using the pptx skill. One slide
+      per section, distilled to the headline points an exec would actually
+      read:
+        Slide 1 — Title + the customer's name + the one-line value prop
+        Slide 2 — Our understanding of the need (3 bullets)
+        Slide 3 — Why us: technical fit + competitive positioning (3 bullets)
+        Slide 4 — Commercial proposal: headline price, term, key concessions
+        Slide 5 — Risks + mitigations + recommended next step
+
+      The deck is the executive read of the same story in the docx — same
+      numbers, same positioning, just compressed. Don't invent new content
+      for the deck.
+
+   The deliverables are the files themselves, not chat messages. Save both
+   to the session container.
 
 # How to talk to specialists
 
@@ -94,6 +111,10 @@ def main() -> None:
         model="claude-opus-4-7",  # Coordinator deserves the most capable model
         system=COORDINATOR_SYSTEM,
         tools=[{"type": "agent_toolset_20260401"}],
+        skills=[
+            {"type": "anthropic", "skill_id": "docx"},
+            {"type": "anthropic", "skill_id": "pptx"},
+        ],
         multiagent={
             "type": "coordinator",
             "agents": [
