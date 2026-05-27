@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deal Desk Swarm - Live Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background: hsl(0, 0%, 100%);
+            --foreground: hsl(0, 0%, 25.1%);
+            --primary: hsl(243.4, 75.4%, 58.6%);
+            --primary-foreground: hsl(210, 40%, 98%);
+            --muted: hsl(0, 0%, 96.1%);
+            --muted-foreground: hsl(0, 0%, 45.1%);
+            --accent: hsl(220, 14.29%, 95.88%);
+            --accent-hard: hsl(220, 13%, 91%);
+            --border: hsl(228, 11%, 91%);
+            --success: hsl(158, 64%, 40%);
+            --success-bg: hsl(158, 64%, 96%);
+            --warning: hsl(25, 95%, 53%);
+            --radius: 0.5rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--muted);
+            color: var(--foreground);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            height: 100vh;
+            gap: 0;
+        }
+
+        /* Main visualization area */
+        .viz-area {
+            position: relative;
+            padding: 32px 40px;
+            overflow: hidden;
+            background: var(--muted);
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--foreground);
+            margin-bottom: 4px;
+            letter-spacing: -0.02em;
+        }
+
+        .header .subtitle {
+            font-size: 0.9rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .header .stats {
+            margin-top: 10px;
+            font-size: 0.875rem;
+            color: var(--muted-foreground);
+        }
+
+        .header .stats .stat {
+            display: inline-block;
+            margin: 0 12px;
+        }
+
+        .header .stats .stat-value {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        /* Agent nodes container */
+        .agents-container {
+            position: relative;
+            height: calc(100% - 150px);
+        }
+
+        .coordinator-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 100px;
+        }
+
+        .specialists-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Agent node card */
+        .agent-node {
+            background: var(--background);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 148px;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+        }
+
+        .agent-node.coordinator {
+            width: 280px;
+            min-height: 164px;
+            border-color: var(--primary);
+            background: var(--background);
+            box-shadow: 0 2px 12px hsla(243.4, 75.4%, 58.6%, 0.12);
+        }
+
+        .agent-node.specialist {
+            border-color: var(--border);
+        }
+
+        /* Status states */
+        .agent-node.idle {
+            border-color: var(--border);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+        }
+
+        .agent-node.running {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px hsla(243.4, 75.4%, 58.6%, 0.15), 0 4px 16px hsla(243.4, 75.4%, 58.6%, 0.2);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .agent-node.completed {
+            border-color: var(--success);
+            box-shadow: 0 0 0 3px hsla(158, 64%, 40%, 0.12), 0 4px 12px hsla(158, 64%, 40%, 0.1);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 3px hsla(243.4, 75.4%, 58.6%, 0.15), 0 4px 16px hsla(243.4, 75.4%, 58.6%, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 0 4px hsla(243.4, 75.4%, 58.6%, 0.25), 0 6px 24px hsla(243.4, 75.4%, 58.6%, 0.3);
+            }
+        }
+
+        /* Agent content */
+        .agent-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .agent-node.idle .agent-icon {
+            background: var(--accent);
+        }
+
+        .agent-node.running .agent-icon {
+            background: hsla(243.4, 75.4%, 58.6%, 0.12);
+            animation: icon-pulse 2s ease-in-out infinite;
+        }
+
+        .agent-node.completed .agent-icon {
+            background: var(--success-bg);
+        }
+
+        @keyframes icon-pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.08);
+            }
+        }
+
+        .agent-name {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--foreground);
+            letter-spacing: -0.01em;
+        }
+
+        .agent-role {
+            font-size: 0.8rem;
+            color: var(--muted-foreground);
+            margin-bottom: 10px;
+        }
+
+        .agent-status {
+            font-size: 0.75rem;
+            color: var(--primary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .agent-node.idle .agent-status {
+            color: var(--muted-foreground);
+        }
+
+        .agent-node.completed .agent-status {
+            color: var(--success);
+        }
+
+        /* Connection lines */
+        .connections {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .connection-line {
+            stroke: var(--primary);
+            stroke-width: 2;
+            fill: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .connection-line.active {
+            opacity: 0.5;
+            animation: flow 1.5s ease-in-out;
+        }
+
+        @keyframes flow {
+            0% {
+                stroke-dashoffset: 1000;
+            }
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        /* Event stream sidebar */
+        .event-stream {
+            background: var(--background);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .stream-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stream-header h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--foreground);
+            margin-bottom: 2px;
+            letter-spacing: -0.01em;
+        }
+
+        .stream-header .count {
+            font-size: 0.8rem;
+            color: var(--muted-foreground);
+        }
+
+        .stream-events {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .event-item {
+            padding: 10px 12px;
+            margin-bottom: 6px;
+            border-radius: 8px;
+            background: var(--muted);
+            border-left: 2.5px solid var(--border);
+            font-size: 0.825rem;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .event-item.thread-created {
+            border-left-color: var(--primary);
+            background: hsla(243.4, 75.4%, 58.6%, 0.05);
+        }
+
+        .event-item.thread-running {
+            border-left-color: var(--warning);
+            background: hsla(25, 95%, 53%, 0.05);
+        }
+
+        .event-item.reply {
+            border-left-color: var(--success);
+            background: var(--success-bg);
+        }
+
+        .event-item.delegate {
+            border-left-color: hsl(213, 94%, 68%);
+            background: hsla(213, 94%, 68%, 0.06);
+        }
+
+        .event-item.tool {
+            border-left-color: hsl(271, 50%, 60%);
+            background: hsla(271, 50%, 60%, 0.05);
+        }
+
+        .event-item.finished {
+            border-left-color: var(--success);
+            background: var(--success-bg);
+        }
+
+        .event-time {
+            color: var(--muted-foreground);
+            font-size: 0.7rem;
+            font-family: 'JetBrains Mono', monospace;
+            margin-right: 6px;
+        }
+
+        .event-type {
+            color: var(--primary);
+            font-weight: 600;
+            margin-right: 6px;
+        }
+
+        .event-content {
+            color: var(--foreground);
+        }
+
+        /* Timeline */
+        .timeline {
+            position: absolute;
+            bottom: 20px;
+            left: 40px;
+            right: 40px;
+            height: 56px;
+            background: var(--background);
+            border-radius: 10px;
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .timeline-label {
+            font-size: 0.75rem;
+            color: var(--muted-foreground);
+            font-weight: 500;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .timeline-bar {
+            height: 8px;
+            background: var(--accent);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timeline-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, hsl(213, 94%, 68%) 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+
+        /* Status badge */
+        .status-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 6px 14px;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--muted-foreground);
+        }
+
+        .status-badge.active {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: hsla(243.4, 75.4%, 58.6%, 0.06);
+        }
+
+        /* Scrollbar styling */
+        .stream-events::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .stream-events::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .stream-events::-webkit-scrollbar-thumb {
+            background: var(--accent-hard);
+            border-radius: 4px;
+        }
+
+        .stream-events::-webkit-scrollbar-thumb:hover {
+            background: hsl(220, 9%, 78%);
+        }
+
+        /* Loading state */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--muted-foreground);
+        }
+
+        .loading-spinner {
+            width: 32px;
+            height: 32px;
+            border: 2.5px solid var(--accent-hard);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Proposal overlay */
+        .proposal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.35);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 32px;
+        }
+
+        .proposal-overlay.visible {
+            display: flex;
+        }
+
+        .proposal-modal {
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 860px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            animation: modalIn 0.25s ease-out;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: translateY(16px) scale(0.98); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .proposal-modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .proposal-modal-header h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--foreground);
+            letter-spacing: -0.01em;
+        }
+
+        .proposal-modal-header .pill {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--primary);
+            background: hsla(243.4, 75.4%, 58.6%, 0.08);
+            border: 1px solid hsla(243.4, 75.4%, 58.6%, 0.2);
+            border-radius: 20px;
+            padding: 3px 10px;
+        }
+
+        .proposal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--muted-foreground);
+            font-size: 1.2rem;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.15s;
+        }
+
+        .proposal-close:hover {
+            background: var(--accent);
+            color: var(--foreground);
+        }
+
+        .proposal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 28px 32px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-hard) transparent;
+        }
+
+        .proposal-body::-webkit-scrollbar { width: 6px; }
+        .proposal-body::-webkit-scrollbar-thumb { background: var(--accent-hard); border-radius: 4px; }
+
+        /* Proposal markdown rendering */
+        .proposal-content {
+            font-size: 0.9rem;
+            line-height: 1.7;
+            color: var(--foreground);
+        }
+
+        .proposal-content h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--foreground);
+            margin: 0 0 6px;
+        }
+
+        .proposal-content h2 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: var(--foreground);
+            margin: 28px 0 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .proposal-content h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--foreground);
+            margin: 18px 0 6px;
+        }
+
+        .proposal-content p {
+            margin: 0 0 12px;
+        }
+
+        .proposal-content strong {
+            font-weight: 600;
+            color: var(--foreground);
+        }
+
+        .proposal-content ul, .proposal-content ol {
+            margin: 0 0 12px;
+            padding-left: 20px;
+        }
+
+        .proposal-content li {
+            margin-bottom: 4px;
+        }
+
+        .proposal-content code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82em;
+            background: var(--accent);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1px 5px;
+            color: var(--foreground);
+        }
+
+        .proposal-content pre {
+            background: var(--accent);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 16px;
+            overflow-x: auto;
+            margin: 0 0 14px;
+        }
+
+        .proposal-content pre code {
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 0.82em;
+        }
+
+        .proposal-content blockquote {
+            border-left: 3px solid var(--primary);
+            margin: 0 0 12px;
+            padding: 8px 16px;
+            background: hsla(243.4, 75.4%, 58.6%, 0.04);
+            border-radius: 0 6px 6px 0;
+        }
+
+        .proposal-content table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85em;
+            margin: 0 0 16px;
+        }
+
+        .proposal-content th {
+            background: var(--accent);
+            font-weight: 600;
+            text-align: left;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            color: var(--foreground);
+        }
+
+        .proposal-content td {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        .proposal-content tr:nth-child(even) td {
+            background: hsl(210, 20%, 99%);
+        }
+
+        /* "View Proposal" button that appears on completion */
+        .view-proposal-btn {
+            display: none;
+            margin-top: 12px;
+            padding: 8px 18px;
+            background: var(--primary);
+            color: var(--primary-foreground);
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+
+        .view-proposal-btn:hover {
+            opacity: 0.88;
+        }
+
+        .view-proposal-btn.visible {
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Main visualization area -->
+        <div class="viz-area">
+            <div class="header">
+                <h1>Deal Desk Swarm</h1>
+                <div class="subtitle">Real-Time Multi-Agent Orchestration</div>
+                <div class="stats">
+                    <span class="stat">
+                        <span class="stat-value" id="activeCount">0</span> Active
+                    </span>
+                    <span class="stat">
+                        <span class="stat-value" id="completedCount">0</span> Completed
+                    </span>
+                </div>
+            </div>
+
+            <div class="status-badge" id="statusBadge">Initializing...</div>
+
+            <!-- SVG for connection lines -->
+            <svg class="connections" id="connectionsSvg">
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7"
+                            refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="hsl(243.4, 75.4%, 58.6%)" />
+                    </marker>
+                </defs>
+            </svg>
+
+            <div class="agents-container">
+                <!-- Coordinator -->
+                <div class="coordinator-row">
+                    <div class="agent-node coordinator idle" id="coordinator" data-agent="coordinator">
+                        <div class="agent-icon">🎯</div>
+                        <div class="agent-name">Coordinator</div>
+                        <div class="agent-role">Deal Desk Orchestrator</div>
+                        <div class="agent-status">Idle</div>
+                    </div>
+                </div>
+
+                <!-- Specialists -->
+                <div class="specialists-row">
+                    <div class="agent-node specialist idle" id="pricing" data-agent="pricing">
+                        <div class="agent-icon">💰</div>
+                        <div class="agent-name">Pricing</div>
+                        <div class="agent-role">Commercial Terms</div>
+                        <div class="agent-status">Idle</div>
+                    </div>
+
+                    <div class="agent-node specialist idle" id="legal" data-agent="legal">
+                        <div class="agent-icon">⚖️</div>
+                        <div class="agent-name">Legal</div>
+                        <div class="agent-role">Contract Review</div>
+                        <div class="agent-status">Idle</div>
+                    </div>
+
+                    <div class="agent-node specialist idle" id="technical" data-agent="technical">
+                        <div class="agent-icon">🔧</div>
+                        <div class="agent-name">Technical Fit</div>
+                        <div class="agent-role">Capability Assessment</div>
+                        <div class="agent-status">Idle</div>
+                    </div>
+
+                    <div class="agent-node specialist idle" id="competitive" data-agent="competitive">
+                        <div class="agent-icon">🎯</div>
+                        <div class="agent-name">Competitive</div>
+                        <div class="agent-role">Market Intelligence</div>
+                        <div class="agent-status">Idle</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="timeline">
+                <div class="timeline-label">Execution Timeline</div>
+                <div class="timeline-bar">
+                    <div class="timeline-progress" id="timelineProgress"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event stream sidebar -->
+        <div class="event-stream">
+            <div class="stream-header">
+                <h2>Event Stream</h2>
+                <div class="count"><span id="eventCount">0</span> events</div>
+                <button class="view-proposal-btn" id="viewProposalBtn" onclick="openProposal()">View Proposal →</button>
+            </div>
+            <div class="stream-events" id="streamEvents">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    Waiting for swarm to start...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Proposal modal -->
+    <div class="proposal-overlay" id="proposalOverlay" onclick="closeProposalIfOutside(event)">
+        <div class="proposal-modal">
+            <div class="proposal-modal-header">
+                <h2>Proposal Response</h2>
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span class="pill">Deal Desk Output</span>
+                    <button class="proposal-close" onclick="closeProposal()" title="Close">✕</button>
+                </div>
+            </div>
+            <div class="proposal-body">
+                <div class="proposal-content" id="proposalContent">
+                    <div class="loading"><div class="loading-spinner"></div>Loading proposal...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Agent name mapping (handles various naming conventions)
+        const agentMapping = {
+            'coordinator': 'coordinator',
+            'Coordinator': 'coordinator',
+            'Deal Desk Orchestrator': 'coordinator',
+            'Pricing Specialist': 'pricing',
+            'pricing-specialist': 'pricing',
+            'Legal Reviewer': 'legal',
+            'legal-reviewer': 'legal',
+            'Technical Fit Specialist': 'technical',
+            'technical-fit-specialist': 'technical',
+            'Competitive Intel Analyst': 'competitive',
+            'competitive-intel-analyst': 'competitive'
+        };
+
+        // State
+        let eventCount = 0;
+        let startTime = null;
+        let activeAgents = new Set();
+        let completedAgents = new Set();
+
+        // DOM elements
+        const streamEvents = document.getElementById('streamEvents');
+        const eventCountEl = document.getElementById('eventCount');
+        const statusBadge = document.getElementById('statusBadge');
+        const timelineProgress = document.getElementById('timelineProgress');
+        const connectionsSvg = document.getElementById('connectionsSvg');
+        const activeCountEl = document.getElementById('activeCount');
+        const completedCountEl = document.getElementById('completedCount');
+
+        // Connect to SSE stream
+        const eventSource = new EventSource('/stream');
+
+        eventSource.onopen = () => {
+            console.log('Connected to event stream');
+            updateStatusBadge('Connected', true);
+        };
+
+        eventSource.onerror = (error) => {
+            console.error('EventSource error:', error);
+            updateStatusBadge('Connection Error', false);
+        };
+
+        eventSource.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.type === 'done') {
+                eventSource.close();
+                updateStatusBadge('Complete', true);
+                return;
+            }
+            handleEvent(data);
+        };
+
+        // Handle incoming events
+        function handleEvent(event) {
+            if (!startTime) {
+                startTime = Date.now();
+                streamEvents.innerHTML = '';
+            }
+
+            const eventType = event.type;
+
+            if (eventType === 'session.status_idle') {
+                eventSource.close();
+                updateStatusBadge('Complete', true);
+            }
+
+            // Update event count
+            eventCount++;
+            eventCountEl.textContent = eventCount;
+
+            // Add event to stream
+            addEventToStream(event);
+
+            // Update visualization based on event type
+            switch (eventType) {
+                case 'session.thread_created':
+                    handleThreadCreated(event);
+                    break;
+                case 'session.thread_status_running':
+                    handleThreadRunning(event);
+                    break;
+                case 'agent.thread_message_received':
+                    handleMessageReceived(event);
+                    break;
+                case 'agent.thread_message_sent':
+                    handleMessageSent(event);
+                    break;
+                case 'agent.tool_use':
+                    handleToolUse(event);
+                    break;
+                case 'session.status_idle':
+                    handleSwarmFinished();
+                    break;
+            }
+
+            // Update timeline
+            updateTimeline();
+        }
+
+        // Add event to stream sidebar
+        function addEventToStream(event) {
+            const eventEl = document.createElement('div');
+            const time = new Date().toLocaleTimeString();
+            const eventType = event.type;
+
+            let className = 'event-item';
+            let icon = '';
+            let message = '';
+
+            if (eventType === 'session.thread_created') {
+                className += ' thread-created';
+                icon = '🚀';
+                message = `Thread spawned: ${event.agent_name}`;
+            } else if (eventType === 'session.thread_status_running') {
+                className += ' thread-running';
+                icon = '⚡';
+                message = `Running: ${event.agent_name || '?'}`;
+            } else if (eventType === 'agent.thread_message_received') {
+                className += ' reply';
+                icon = '⬅️';
+                message = `Reply from: ${event.from_agent_name}`;
+            } else if (eventType === 'agent.thread_message_sent') {
+                className += ' delegate';
+                icon = '➡️';
+                message = `Delegate to: ${event.to_agent_name}`;
+            } else if (eventType === 'agent.tool_use') {
+                className += ' tool';
+                icon = '🔧';
+                message = `Tool: ${event.name || '?'}`;
+            } else if (eventType === 'session.status_idle') {
+                className += ' finished';
+                icon = '✅';
+                message = 'Swarm finished';
+            }
+
+            eventEl.className = className;
+            eventEl.innerHTML = `
+                <span class="event-time">${time}</span>
+                <span class="event-type">${icon}</span>
+                <span class="event-content">${message}</span>
+            `;
+
+            streamEvents.insertBefore(eventEl, streamEvents.firstChild);
+
+            // Limit to 100 events
+            while (streamEvents.children.length > 100) {
+                streamEvents.removeChild(streamEvents.lastChild);
+            }
+        }
+
+        // Handle thread created
+        function handleThreadCreated(event) {
+            const agentKey = getAgentKey(event.agent_name);
+            if (agentKey) {
+                const node = document.getElementById(agentKey);
+                if (node) {
+                    updateAgentStatus(node, 'idle');
+                }
+            }
+        }
+
+        // Handle thread running
+        function handleThreadRunning(event) {
+            const agentKey = getAgentKey(event.agent_name);
+            if (agentKey) {
+                const node = document.getElementById(agentKey);
+                if (node) {
+                    updateAgentStatus(node, 'running');
+                    activeAgents.add(agentKey);
+                }
+            }
+            updateStatusBadge('Running', true);
+        }
+
+        // Handle message received
+        function handleMessageReceived(event) {
+            const fromKey = getAgentKey(event.from_agent_name);
+            if (fromKey) {
+                const node = document.getElementById(fromKey);
+                if (node) {
+                    updateAgentStatus(node, 'completed');
+                    completedAgents.add(fromKey);
+                    activeAgents.delete(fromKey);
+                }
+
+                // Draw connection line back to coordinator
+                drawConnection(fromKey, 'coordinator');
+            }
+        }
+
+        // Handle message sent
+        function handleMessageSent(event) {
+            const toKey = getAgentKey(event.to_agent_name);
+            if (toKey) {
+                // Draw connection line from coordinator to specialist
+                drawConnection('coordinator', toKey);
+            }
+        }
+
+        // Handle tool use
+        function handleToolUse(event) {
+            // Just update the event stream, handled by addEventToStream
+        }
+
+        // Handle swarm finished
+        function handleSwarmFinished() {
+            updateStatusBadge('Completed ✓', true);
+            timelineProgress.style.width = '100%';
+
+            // Mark all remaining active agents as completed
+            activeAgents.forEach(agentKey => {
+                const node = document.getElementById(agentKey);
+                if (node) {
+                    updateAgentStatus(node, 'completed');
+                }
+            });
+            activeAgents.clear();
+
+            // Show "View Proposal" button
+            document.getElementById('viewProposalBtn').classList.add('visible');
+        }
+
+        // Proposal modal
+        async function openProposal() {
+            document.getElementById('proposalOverlay').classList.add('visible');
+            const contentEl = document.getElementById('proposalContent');
+            contentEl.innerHTML = '<div class="loading"><div class="loading-spinner"></div>Loading proposal...</div>';
+
+            try {
+                const res = await fetch('/output');
+                if (!res.ok) {
+                    contentEl.innerHTML = '<p style="color:var(--muted-foreground)">Proposal not available yet. The swarm is still running.</p>';
+                    return;
+                }
+                const data = await res.json();
+                if (data.status === 'ready' && data.content) {
+                    contentEl.innerHTML = renderMarkdown(data.content);
+                } else {
+                    contentEl.innerHTML = '<p style="color:var(--muted-foreground)">Proposal not available yet.</p>';
+                }
+            } catch (e) {
+                contentEl.innerHTML = '<p style="color:var(--muted-foreground)">Proposal not available yet.</p>';
+            }
+        }
+
+        function closeProposal() {
+            document.getElementById('proposalOverlay').classList.remove('visible');
+        }
+
+        function closeProposalIfOutside(e) {
+            if (e.target === document.getElementById('proposalOverlay')) closeProposal();
+        }
+
+        // Minimal markdown renderer (headings, bold, lists, code, tables, hr)
+        function renderMarkdown(text) {
+            const lines = text.split('\n');
+            let html = '';
+            let inPre = false;
+            let inTable = false;
+            let inList = false;
+            let listTag = '';
+
+            const escapeHtml = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+            const inlineFormat = s => s
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+                .replace(/~~([^~]+)~~/g, '<del>$1</del>');
+
+            for (let i = 0; i < lines.length; i++) {
+                const raw = lines[i];
+                const line = raw;
+
+                if (line.startsWith('```')) {
+                    if (inList) { html += `</${listTag}>`; inList = false; }
+                    if (inTable) { html += '</table>'; inTable = false; }
+                    inPre = !inPre;
+                    html += inPre ? '<pre><code>' : '</code></pre>';
+                    continue;
+                }
+                if (inPre) { html += escapeHtml(line) + '\n'; continue; }
+
+                // Tables
+                if (line.includes('|') && line.trim().startsWith('|')) {
+                    if (inList) { html += `</${listTag}>`; inList = false; }
+                    const cols = line.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+                    const nextLine = lines[i + 1] || '';
+                    const isSep = /^\|[-| :]+\|$/.test(nextLine.trim());
+                    if (isSep) {
+                        if (!inTable) { html += '<table>'; inTable = true; }
+                        html += '<tr>' + cols.map(c => `<th>${inlineFormat(escapeHtml(c))}</th>`).join('') + '</tr>';
+                        i++; // skip separator
+                        continue;
+                    }
+                    if (inTable) {
+                        if (line.trim() === '' || !line.includes('|')) { html += '</table>'; inTable = false; }
+                        else { html += '<tr>' + cols.map(c => `<td>${inlineFormat(escapeHtml(c))}</td>`).join('') + '</tr>'; continue; }
+                    }
+                }
+                if (inTable && !line.includes('|')) { html += '</table>'; inTable = false; }
+
+                if (line === '') {
+                    if (inList) { html += `</${listTag}>`; inList = false; }
+                    html += '';
+                    continue;
+                }
+
+                // Headings
+                const h3 = line.match(/^### (.+)/);
+                const h2 = line.match(/^## (.+)/);
+                const h1 = line.match(/^# (.+)/);
+                if (h1) { if (inList) { html += `</${listTag}>`; inList = false; } html += `<h1>${inlineFormat(escapeHtml(h1[1]))}</h1>`; continue; }
+                if (h2) { if (inList) { html += `</${listTag}>`; inList = false; } html += `<h2>${inlineFormat(escapeHtml(h2[1]))}</h2>`; continue; }
+                if (h3) { if (inList) { html += `</${listTag}>`; inList = false; } html += `<h3>${inlineFormat(escapeHtml(h3[1]))}</h3>`; continue; }
+
+                // HR
+                if (/^(-{3,}|\*{3,}|_{3,})$/.test(line.trim())) { html += '<hr>'; continue; }
+
+                // Blockquote
+                const bq = line.match(/^> (.+)/);
+                if (bq) { if (inList) { html += `</${listTag}>`; inList = false; } html += `<blockquote><p>${inlineFormat(escapeHtml(bq[1]))}</p></blockquote>`; continue; }
+
+                // Lists
+                const ul = line.match(/^[-*+] (.+)/);
+                const ol = line.match(/^\d+\. (.+)/);
+                if (ul) {
+                    if (!inList || listTag !== 'ul') { if (inList) html += `</${listTag}>`; html += '<ul>'; inList = true; listTag = 'ul'; }
+                    html += `<li>${inlineFormat(escapeHtml(ul[1]))}</li>`;
+                    continue;
+                }
+                if (ol) {
+                    if (!inList || listTag !== 'ol') { if (inList) html += `</${listTag}>`; html += '<ol>'; inList = true; listTag = 'ol'; }
+                    html += `<li>${inlineFormat(escapeHtml(ol[1]))}</li>`;
+                    continue;
+                }
+
+                if (inList) { html += `</${listTag}>`; inList = false; }
+                html += `<p>${inlineFormat(escapeHtml(line))}</p>`;
+            }
+
+            if (inPre) html += '</code></pre>';
+            if (inList) html += `</${listTag}>`;
+            if (inTable) html += '</table>';
+
+            return html;
+        }
+
+        // Update agent status
+        function updateAgentStatus(node, status) {
+            node.classList.remove('idle', 'running', 'completed');
+            node.classList.add(status);
+
+            const statusEl = node.querySelector('.agent-status');
+            if (statusEl) {
+                statusEl.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+            }
+
+            // Update stats
+            updateStats();
+        }
+
+        // Update statistics in header
+        function updateStats() {
+            activeCountEl.textContent = activeAgents.size;
+            completedCountEl.textContent = completedAgents.size;
+        }
+
+        // Draw connection line between agents
+        function drawConnection(fromKey, toKey) {
+            const fromNode = document.getElementById(fromKey);
+            const toNode = document.getElementById(toKey);
+
+            if (!fromNode || !toNode) return;
+
+            const fromRect = fromNode.getBoundingClientRect();
+            const toRect = toNode.getBoundingClientRect();
+            const svgRect = connectionsSvg.getBoundingClientRect();
+
+            const x1 = fromRect.left + fromRect.width / 2 - svgRect.left;
+            const y1 = fromRect.top + fromRect.height / 2 - svgRect.top;
+            const x2 = toRect.left + toRect.width / 2 - svgRect.left;
+            const y2 = toRect.top + toRect.height / 2 - svgRect.top;
+
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            const d = `M ${x1} ${y1} Q ${(x1 + x2) / 2} ${(y1 + y2) / 2} ${x2} ${y2}`;
+
+            line.setAttribute('d', d);
+            line.setAttribute('class', 'connection-line active');
+            line.setAttribute('stroke-dasharray', '1000');
+            line.setAttribute('stroke-dashoffset', '1000');
+            line.setAttribute('marker-end', 'url(#arrowhead)');
+
+            connectionsSvg.appendChild(line);
+
+            // Remove line after animation
+            setTimeout(() => {
+                line.classList.remove('active');
+                setTimeout(() => line.remove(), 300);
+            }, 1500);
+        }
+
+        // Update timeline progress
+        function updateTimeline() {
+            if (!startTime) return;
+
+            const elapsed = Date.now() - startTime;
+            const estimatedTotal = 60000; // 60 seconds estimated
+            const progress = Math.min((elapsed / estimatedTotal) * 100, 95);
+
+            timelineProgress.style.width = `${progress}%`;
+        }
+
+        // Update status badge
+        function updateStatusBadge(text, active) {
+            statusBadge.textContent = text;
+            if (active) {
+                statusBadge.classList.add('active');
+            } else {
+                statusBadge.classList.remove('active');
+            }
+        }
+
+        // Get agent key from agent name
+        function getAgentKey(agentName) {
+            return agentMapping[agentName] || null;
+        }
+
+        // Update timeline periodically
+        setInterval(updateTimeline, 1000);
+    </script>
+</body>
+</html>

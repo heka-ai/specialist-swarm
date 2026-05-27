@@ -14,15 +14,20 @@ import json
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from anthropic import Anthropic
 from anthropic.lib import files_from_dir
 
 
-# Map skill directory name → specialist key that should get it
+# Map skill directory name → specialist key that should get it.
+# Use "coordinator" to attach a skill to the coordinator agent instead.
 SKILL_TO_SPECIALIST = {
     "pricing-playbook": "pricing",
     "legal-checklist":  "legal",
     "competitive-intel": "competitive",
+    "sia-firm-voice": "coordinator",
 }
 
 
@@ -34,6 +39,11 @@ def main() -> None:
     if not specialist_ids_path.exists():
         raise SystemExit("Run create_specialists.py first.")
     specialist_ids = json.loads(specialist_ids_path.read_text())
+
+    coordinator_id_path = Path(".coordinator_id")
+    if not coordinator_id_path.exists():
+        raise SystemExit("Run create_coordinator.py first (missing .coordinator_id).")
+    coordinator_id = coordinator_id_path.read_text().strip()
 
     client = Anthropic()
 
@@ -69,15 +79,18 @@ def main() -> None:
             uploaded[skill_name] = skill.id
             print(f"  -> {skill.id}")
 
-        # 2. Attach to the matching specialist by updating its skills array
-        specialist_id = specialist_ids[specialist_key]
+        # 2. Attach to the matching agent by updating its skills array
+        if specialist_key == "coordinator":
+            agent_id = coordinator_id
+        else:
+            agent_id = specialist_ids[specialist_key]
         skill_id = uploaded[skill_name]
-        print(f"  attaching to specialist `{specialist_key}` ({specialist_id})...")
+        print(f"  attaching to `{specialist_key}` ({agent_id})...")
 
-        current = client.beta.agents.retrieve(specialist_id)
+        current = client.beta.agents.retrieve(agent_id)
         # Avoid duplicate attachment on re-run
         already_attached = any(
-            s.get("skill_id") == skill_id for s in (current.skills or [])
+            getattr(s, "skill_id", None) == skill_id for s in (current.skills or [])
         )
         if already_attached:
             print(f"  already attached ✓ (skipping)")
@@ -87,7 +100,7 @@ def main() -> None:
             {"type": "custom", "skill_id": skill_id, "version": "latest"}
         ]
         client.beta.agents.update(
-            specialist_id,
+            agent_id,
             version=current.version,
             skills=new_skills,
         )

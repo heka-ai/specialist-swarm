@@ -51,9 +51,41 @@ See [`stretch-goals.md`](./stretch-goals.md). The big ones:
 - **Memory across deals** — coordinator remembers past wins and re-uses the right ones
 - **Synthetic MCP for past wins** — wire up a fake CRM to the pricing specialist
 
+## Live Dashboard (NEW!)
+
+Want to demo the swarm on a big screen? Use the real-time visualization dashboard:
+
+```bash
+chmod +x run_dashboard.sh
+./run_dashboard.sh
+# Open http://localhost:5000 in your browser
+```
+
+The dashboard shows all 5 agents in a visual layout with:
+- Real-time status updates (idle/running/completed)
+- Animated connection lines between agents
+- Event stream sidebar
+- Live statistics
+- Sia Partners branding
+
+**The demo moment:** When the coordinator delegates to all 4 specialists, they all light up simultaneously with pulsing red animations. The parallel execution is visually obvious.
+
+See [`DASHBOARD_GUIDE.md`](./DASHBOARD_GUIDE.md) for full documentation and demo tips.
+
+### Test Mode (No API Required)
+```bash
+python dashboard_test.py
+```
+Simulates the swarm events for testing the dashboard without using API credits.
+
 ## Two-minute demo
 
-Two-monitor setup:
+**Option A:** Use the dashboard (recommended for presentations)
+- Full-screen the browser at http://localhost:5000
+- Watch all agents light up during parallel execution
+- Show outputs afterward
+
+**Option B:** Two-monitor setup
 - **Monitor 1:** the events stream from the coordinator session, scrolling. You'll see `session.thread_created` × 4, parallel `running`, then `agent.thread_message_received` flowing back. The visible parallelism IS the demo.
 - **Monitor 2:** open `outputs/proposal-response.docx`. Real document, branded, ready to send.
 
@@ -62,7 +94,7 @@ Narrate the events stream while it runs. The room will get it.
 ## What's in this folder
 
 ```
-03-specialist-swarm/
+specialist-swarm/
 ├── README.md
 ├── scenario-cards.md
 ├── stretch-goals.md
@@ -72,6 +104,14 @@ Narrate the events stream while it runs. The room will get it.
 ├── upload_skills.py               (uploads custom skills via Skills API)
 ├── run_deal_desk.py               (runs the full swarm against an RFP)
 ├── stretch_critic_subagent.py     (stretch: critic agent)
+├── dashboard_server.py            (NEW: Flask server for live visualization)
+├── dashboard_test.py              (NEW: test mode with simulated events)
+├── run_dashboard.sh               (NEW: quick launch script)
+├── DASHBOARD_GUIDE.md             (NEW: dashboard usage guide)
+├── DASHBOARD_SUMMARY.md           (NEW: technical implementation details)
+├── dashboard/                     (NEW: visualization frontend)
+│   ├── index.html                 (self-contained dashboard)
+│   └── README.md                  (dashboard documentation)
 ├── skills/                        (custom skills, one per specialist)
 │   ├── pricing-playbook/SKILL.md
 │   ├── legal-checklist/SKILL.md
