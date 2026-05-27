@@ -27,6 +27,8 @@ app = Flask(__name__)
 
 # Global event queue for SSE
 event_queue = queue.Queue()
+_swarm_started = False
+_swarm_lock = threading.Lock()
 
 # Configuration
 RFP_PATH = Path("synthetic-data/rfp-acme-corp.md")
@@ -236,9 +238,11 @@ def index():
 def stream():
     """Server-Sent Events endpoint for streaming swarm events."""
     def generate():
-        # Start the swarm in a background thread
-        swarm_thread = threading.Thread(target=run_swarm, daemon=True)
-        swarm_thread.start()
+        global _swarm_started
+        with _swarm_lock:
+            if not _swarm_started:
+                _swarm_started = True
+                threading.Thread(target=run_swarm, daemon=True).start()
 
         # Stream events from the queue
         while True:

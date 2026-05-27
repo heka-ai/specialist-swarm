@@ -1,45 +1,43 @@
-The RFP is clear. Acme is a Microsoft/Azure shop, $1.4B industrial IoT manufacturer, 280TB data, 40K devices, 80K events/sec peak, Power BI non-negotiable (600 users), EU residency mandatory. They're benchmarking us against Databricks/Snowflake/Fabric. The contract demands are aggressive — uncapped liability, 99.99% SLA with immediate termination on any miss, 35% minimum discount, Net 90, MFN, full IP assignment, 30-day termination at will, 4x/year no-notice audits at vendor cost. Deadline May 26.
+I'll run this fast. First I need to load the docx, pptx, and firm voice skills, then delegate to all four specialists in parallel.RFP read. Curveballs: 99.99% SLA with immediate termination, uncapped liability, 35% discount floor, MFN clause, Net 90, full IP assignment, unannounced 4x/year audits at vendor cost, no-cause 30-day termination, fixed pricing 5 years no escalators. This contract is gold-plated against the vendor. We're a Power-BI / Azure / lakehouse fit but our SLA is 99.95% stock. Three of our four named competitors are top-tier.
 
-Delegating all four specialists in parallel now.All four specialists are working in parallel. Ending turn to wait for their replies.Competitive intel received. Strong material. Waiting on the other three.Technical fit in. Two down, two to go.Legal in. One left — waiting on Pricing.All four specialists have reported. Synthesizing now.
+Delegating to all four specialists in parallel now.All four specialists briefed and working in parallel. Ending turn to await their reports.Competitive intel received. Holding for the other three.Technical fit in. Waiting on Pricing and Legal.Legal in. Pricing still pending.All four specialists in. Synthesising now and building both deliverables in parallel.
 
-**Synthesis:**
-- **Open:** $702K/yr net (22% off $900K list), 5yr term, fixed Y1–3, CPI-capped Y4–5
-- **Walk-away:** $648K (28%) with prepay + reference customer agreement
-- **99.99% SLA add-on:** +$100K/yr (active-active multi-region)
-- **Three lead messages:** Power BI DirectQuery at scale + EU per-table residency + proven 250K events/sec headroom
-- **Beat Fabric** with Initech TCO playbook
-- **Red lines:** uncapped liability, full IP assignment, immediate-termination-on-SLA, MFN, Net 90 — all refused or countered
-- **Timeline:** 24 weeks multi-region multi-source, Teradata decommission track to 2027
+Key reconciliations:
+- SLA: offer 99.99% add-on (bundled in price) but redefine remedy as service credits, not refund-on-miss-and-terminate
+- Liability: cap at 24 months (legal's position; pricing's 12-mo is hard fallback)
+- Discount: lead at 22%, ceiling 25%; refuse the 35% anchor
+- IP: Stark precedent — license-back, not assignment
 
-Building the Word doc and the pitch deck now.Now I'll build the Word proposal document.Docx is valid. Now building the 5-slide executive deck.The deck looks strong across all 5 slides. Let me visually verify the docx.Both deliverables render cleanly. Moving the final files to outputs.Both deliverables are in `/mnt/session/outputs/`. Deal Desk synthesis complete.
+Let me check the environment and start building both deliverables.Environment ready. Building docx and pptx in parallel.Both files built. Now validate the docx and visually inspect the deck.Validations pass. Let me visually inspect the deck.I see issues that need fixing before delivery:
 
-## Summary of the response
+1. **Slide 1**: "Submitt ed" and "Prepared for" labels have weird kerning — fix charSpacing
+2. **Slide 4**: "$3.15M" stat overflows its box (font too large, "M" wraps to new line)
+3. **Slide 5**: Title squished against the top accent bar
 
-**Deliverables**
-- `acme-rfp-response.docx` — 12-page branded proposal, eight sections from cover through next-steps
-- `acme-rfp-deck.pptx` — 5-slide executive brief on the same numbers and positioning
+Let me fix these.All three fixes landed cleanly. Slide 1 labels read properly, slide 4 stat callouts fit, slide 5 has clean spacing. Deck is ready.
 
-**Headline commercial position**
-- $702K/yr net (22% off $900K list) — Years 1–3 fixed
-- $725K → $748K in Years 4–5 with CPI cap at 5%
-- 5-year total: **$3.58M**
-- Walk-away: 28% off / $648K, with prepay + reference agreement
-- 99.99% SLA priced as a +$100K/yr add-on (active-active multi-region)
-- Net 60, not Net 90. Hard floor.
+Let me move both deliverables to outputs and verify content one more time.Both deliverables shipped to `/mnt/session/outputs/`. RFP response is complete.
 
-**The three lead messages**
-1. Power BI DirectQuery at 600 seats — most mature integration in the market
-2. EU residency at table level, not just region
-3. 80K events/sec inside our envelope (production-validated at 250K)
+---
 
-**Contract red lines we hold**
-- Uncapped breach liability → cap at 24 months fees, exclude consequential damages
-- Full IP assignment → licence-back model (Stark Industries precedent)
-- Immediate termination on any SLA miss → ≥3 misses in rolling 12 months
-- Perpetual MFN → point-in-time at signature only
-- 4×/yr no-notice audit → 2×/yr with 30 days notice, Acme pays
+## Deal Desk Summary — Acme Corp Enterprise Data Platform
 
-**Competitive play**
-Fabric is the real threat. The win is the Initech playbook: reframe to 3-year TCO at Acme's real workload, including Microsoft stabilisation hours and Power BI refresh fixes. Don't race on headline discount — that's how we lost Pied Piper.
+**Deliverables:**
+- `acme-proposal.docx` — full proposal response (Exec Summary, Understanding, Why Us + competitive table, Commercial with pricing/terms tables, Contract approach with red-line table, Risks with mitigations table, Next Steps)
+- `acme-proposal-deck.pptx` — 5-slide executive pitch (Title + value prop / Need / Why Us / Commercial / Risks & Next Step)
 
-**Next step recommended to Acme:** Clarification call with Sarah Chen + Marcus Webb within 5 business days; redlined master agreement exchanged by 15 June; signature by 25 June, ahead of the 30 June award date.
+**Position we're going to market with:**
+
+| Dimension | Our position |
+|---|---|
+| **Year 1 price** | USD 640K (22% off USD 820K list, which includes the 99.99% SLA add-on) |
+| **5-year TCO** | ~USD 3.15M — ~20% below projected Databricks/Snowflake |
+| **Term** | 3-yr commit + 2-yr renewal. Fixed for 3 yrs; CPI-capped 3% in yrs 4–5 |
+| **Payment** | Net 60 annual prepay (refused Net 90) |
+| **Discount ceiling** | 25% strategic with reference + quarterly billing. Walk at 35%+ |
+| **Five §4 blockers** | All countered with defined fallbacks: liability cap 24mo, audits 1/yr with 30-day notice, SLA credits (not termination), Stark-pattern IP licence-back, subprocessor notice with reasonable-objection right |
+| **MFN** | Declined as drafted — narrow benchmark only, sunsets at year 3 |
+
+**Read on the deal:** Technical fit is HIGH. Initech precedent (industrial/IoT, beat MSFT Fabric on real-time SLA) is our strongest reference. Microsoft Fabric is the biggest threat via incumbency; Databricks the biggest threat on price. Pied Piper is the cautionary tale — walk if Acme treats this as commodity procurement and refuses to engage on TCO or contractual structure.
+
+**Recommended next step embedded in the proposal:** Joint commercial + legal working session week of 1 June to close the five §4 positions ahead of 30 June award.

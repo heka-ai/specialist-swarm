@@ -1,0 +1,30 @@
+# Proposal Response — Acme Corp RFP
+
+## Executive Summary
+
+- **Full technical fit** across all 12 stated requirements
+- **$594K Year-1 ACV** at 17.5% discount (5-yr TCV ~$3.15M)
+- **24-week implementation** with phased rollout across 3 regions
+
+## Our Understanding
+
+Acme Corp is a $1.4B industrial IoT manufacturer seeking to consolidate 280TB of operational data across Azure and on-prem sources. The current Teradata + Informatica stack cannot scale to 80K events/sec or support the real-time ML pipeline your R&D team needs.
+
+## Why Sia Partners + BTS-Synthetic
+
+We bring transformation consulting + a proven data platform. Our Initech win (same industry, same scale) delivered 40% cost reduction in 6 months. Fabric can't match our streaming throughput; Databricks can't match our TCO.
+
+## Commercial Proposal
+
+| Item | Value |
+|------|-------|
+| Year 1 ACV | $594,000 |
+| Discount | 17.5% from list |
+| Term | 5 years |
+| Payment | Net 45 |
+
+## Next Steps
+
+1. Technical deep-dive (Week of June 2)
+2. Commercial negotiation (June 9)
+3. Contract execution (June 20)

@@ -5,7 +5,7 @@ Useful for testing the visualization and animations quickly.
 Usage:
     python dashboard_test.py
 
-Then open http://localhost:5050/test.html
+Then open http://localhost:5051/test.html
 """
 
 import json
@@ -14,6 +14,45 @@ import threading
 from pathlib import Path
 
 from flask import Flask, Response, send_from_directory
+
+OUTPUT_DIR = Path("outputs")
+
+SAMPLE_PROPOSAL = """# Proposal Response — Acme Corp RFP
+
+## Executive Summary
+
+- **Full technical fit** across all 12 stated requirements
+- **$594K Year-1 ACV** at 17.5% discount (5-yr TCV ~$3.15M)
+- **24-week implementation** with phased rollout across 3 regions
+
+## Our Understanding
+
+Acme Corp is a $1.4B industrial IoT manufacturer seeking to consolidate \
+280TB of operational data across Azure and on-prem sources. The current \
+Teradata + Informatica stack cannot scale to 80K events/sec or support \
+the real-time ML pipeline your R&D team needs.
+
+## Why Sia Partners + BTS-Synthetic
+
+We bring transformation consulting + a proven data platform. Our Initech \
+win (same industry, same scale) delivered 40% cost reduction in 6 months. \
+Fabric can't match our streaming throughput; Databricks can't match our TCO.
+
+## Commercial Proposal
+
+| Item | Value |
+|------|-------|
+| Year 1 ACV | $594,000 |
+| Discount | 17.5% from list |
+| Term | 5 years |
+| Payment | Net 45 |
+
+## Next Steps
+
+1. Technical deep-dive (Week of June 2)
+2. Commercial negotiation (June 9)
+3. Contract execution (June 20)
+"""
 
 app = Flask(__name__)
 
@@ -102,6 +141,12 @@ def stream():
         print("Test sequence complete!")
         print("=" * 60 + "\n")
 
+        # Save simulated output to disk
+        OUTPUT_DIR.mkdir(exist_ok=True)
+        transcript_path = OUTPUT_DIR / "coordinator-transcript.txt"
+        transcript_path.write_text(SAMPLE_PROPOSAL)
+        print(f"Simulated transcript saved to {transcript_path}")
+
         # Send a done event so the frontend closes the EventSource
         yield f"data: {json.dumps({'type': 'done'})}\n\n"
 
@@ -110,36 +155,11 @@ def stream():
 
 @app.route('/output')
 def output():
-    """Return simulated proposal output."""
-    return {
-        "status": "ready",
-        "content": (
-            "# Proposal Response — Acme Corp RFP\n\n"
-            "## Executive Summary\n\n"
-            "- **Full technical fit** across all 12 stated requirements\n"
-            "- **$594K Year-1 ACV** at 17.5% discount (5-yr TCV ~$3.15M)\n"
-            "- **24-week implementation** with phased rollout across 3 regions\n\n"
-            "## Our Understanding\n\n"
-            "Acme Corp is a $1.4B industrial IoT manufacturer seeking to consolidate "
-            "280TB of operational data across Azure and on-prem sources. The current "
-            "Teradata + Informatica stack cannot scale to 80K events/sec or support "
-            "the real-time ML pipeline your R&D team needs.\n\n"
-            "## Why Sia Partners + BTS-Synthetic\n\n"
-            "We bring transformation consulting + a proven data platform. Our Initech "
-            "win (same industry, same scale) delivered 40% cost reduction in 6 months. "
-            "Fabric can't match our streaming throughput; Databricks can't match our TCO.\n\n"
-            "## Commercial Proposal\n\n"
-            "| Item | Value |\n|------|-------|\n"
-            "| Year 1 ACV | $594,000 |\n"
-            "| Discount | 17.5% from list |\n"
-            "| Term | 5 years |\n"
-            "| Payment | Net 45 |\n\n"
-            "## Next Steps\n\n"
-            "1. Technical deep-dive (Week of June 2)\n"
-            "2. Commercial negotiation (June 9)\n"
-            "3. Contract execution (June 20)\n"
-        ),
-    }
+    """Return the proposal output — from disk if saved, otherwise the sample."""
+    transcript_path = OUTPUT_DIR / "coordinator-transcript.txt"
+    if transcript_path.exists():
+        return {"status": "ready", "content": transcript_path.read_text()}
+    return {"status": "pending", "content": None}
 
 
 @app.route('/status')
@@ -159,12 +179,12 @@ def main():
     print("\nThis is a test mode that simulates swarm events without")
     print("calling the Anthropic API. Use this to test the dashboard")
     print("visualization and animations quickly.\n")
-    print("Starting server on http://localhost:5050")
-    print("Open your browser and navigate to: http://localhost:5050\n")
+    print("Starting server on http://localhost:5051")
+    print("Open your browser and navigate to: http://localhost:5051\n")
     print("The simulated swarm will run automatically.")
     print("=" * 60 + "\n")
 
-    app.run(host='0.0.0.0', port=5050, debug=False, threaded=True)
+    app.run(host='0.0.0.0', port=5051, debug=False, threaded=True)
 
 
 if __name__ == "__main__":

@@ -3,330 +3,317 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deal Desk Swarm - Live Dashboard</title>
+    <title>Deal Desk Swarm — Sia Partners</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --background: hsl(0, 0%, 100%);
-            --foreground: hsl(0, 0%, 25.1%);
-            --primary: hsl(243.4, 75.4%, 58.6%);
-            --primary-foreground: hsl(210, 40%, 98%);
-            --muted: hsl(0, 0%, 96.1%);
-            --muted-foreground: hsl(0, 0%, 45.1%);
-            --accent: hsl(220, 14.29%, 95.88%);
-            --accent-hard: hsl(220, 13%, 91%);
-            --border: hsl(228, 11%, 91%);
-            --success: hsl(158, 64%, 40%);
-            --success-bg: hsl(158, 64%, 96%);
-            --warning: hsl(25, 95%, 53%);
-            --radius: 0.5rem;
+            --white: #ffffff;
+            --black: #0a151e;
+            --teal: #00decc;
+            --navy: #173044;
+            --teal-dark: #077c84;
+            --teal-medium: #00a2a3;
+            --teal-light: #9ff3f0;
+            --gray-cool: #445569;
+            --gray-medium: #8796a9;
+            --gray-100: #ced5df;
+            --gray-light: #f4f6fc;
+            --gradient-blue: #f4f6fc;
+            --gradient-pink: #ffeaf0;
+            --gradient-orange: #ffeee1;
+
+            --spacing: 8px;
+            --radius: 8px;
+
+            --success: #16a34a;
+            --success-bg: #f0fdf4;
+            --warning: #ea580c;
+            --warning-bg: #fff7ed;
+            --info: #2563eb;
+            --info-bg: #eff6ff;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--muted);
-            color: var(--foreground);
+            font-family: 'Sora', Inter, system-ui, sans-serif;
+            color: var(--black);
+            background:
+                linear-gradient(to right, rgba(230, 230, 250, 0.8), rgba(173, 162, 164, 0) 60%),
+                radial-gradient(rgba(255, 252, 250, 1), transparent),
+                linear-gradient(rgb(210, 227, 247), rgb(250, 231, 218));
+            background-attachment: fixed;
+            min-height: 100vh;
             overflow: hidden;
-            height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+            line-height: 1.5;
+            font-weight: 400;
         }
 
         .container {
             display: grid;
-            grid-template-columns: 1fr 380px;
+            grid-template-columns: 1fr 400px;
             height: 100vh;
-            gap: 0;
         }
 
-        /* Main visualization area */
+        /* Main area */
         .viz-area {
             position: relative;
-            padding: 32px 40px;
+            padding: 28px 36px;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
-            background: var(--muted);
         }
 
         /* Header */
         .header {
-            text-align: center;
-            margin-bottom: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            flex-shrink: 0;
         }
 
-        .header h1 {
-            font-size: 1.75rem;
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo {
+            width: 38px;
+            height: 38px;
+            background: var(--black);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: 700;
-            color: var(--foreground);
-            margin-bottom: 4px;
-            letter-spacing: -0.02em;
+            font-size: 13px;
+            color: white;
+            letter-spacing: -0.5px;
         }
 
-        .header .subtitle {
-            font-size: 0.9rem;
-            color: var(--primary);
+        .header-title h1 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--black);
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            padding: 0;
+        }
+
+        .header-title .subtitle {
+            font-size: 0.7rem;
+            color: var(--gray-cool);
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.08rem;
+            margin: 4px 0 0;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 28px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--black);
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: var(--gray-cool);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
             font-weight: 500;
         }
 
-        .header .stats {
-            margin-top: 10px;
-            font-size: 0.875rem;
-            color: var(--muted-foreground);
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border: 1px solid var(--gray-100);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            color: var(--gray-cool);
         }
 
-        .header .stats .stat {
-            display: inline-block;
-            margin: 0 12px;
+        .status-badge.active {
+            border-color: var(--teal);
+            color: var(--teal-dark);
+            background: rgba(159, 243, 240, 0.3);
         }
 
-        .header .stats .stat-value {
-            color: var(--primary);
-            font-weight: 600;
-            font-size: 1.1rem;
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--gray-medium);
         }
 
-        /* Agent nodes container */
+        .status-badge.active .status-dot {
+            background: var(--teal);
+            animation: dot-pulse 1.5s ease-in-out infinite;
+            box-shadow: 0 0 0 3px rgba(0, 222, 204, 0.2);
+        }
+
+        @keyframes dot-pulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 3px rgba(0, 222, 204, 0.2); }
+            50% { opacity: 0.6; box-shadow: 0 0 0 6px rgba(0, 222, 204, 0.1); }
+        }
+
+        /* Agents container */
         .agents-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 60px;
             position: relative;
-            height: calc(100% - 150px);
         }
 
         .coordinator-row {
             display: flex;
             justify-content: center;
-            margin-bottom: 100px;
         }
 
         .specialists-row {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            max-width: 1400px;
-            margin: 0 auto;
+            gap: 16px;
         }
 
-        /* Voting panel — three Legal voters that convene on contentious calls */
-        .voting-panel {
-            max-width: 760px;
-            margin: 36px auto 0;
-            padding: 18px 20px 16px;
-            background: var(--background);
-            border: 1px dashed var(--border);
-            border-radius: 14px;
-            opacity: 0.55;
-            transition: opacity 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
-        }
-
-        .voting-panel.armed {
-            opacity: 1;
-            border-style: solid;
-            border-color: var(--primary);
-            box-shadow: 0 4px 18px hsla(243.4, 75.4%, 58.6%, 0.12);
-        }
-
-        .voting-panel-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
-        .voting-panel-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            color: var(--muted-foreground);
-        }
-
-        .voting-panel.armed .voting-panel-title {
-            color: var(--primary);
-        }
-
-        .voting-panel-tally {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            color: var(--muted-foreground);
-            background: var(--muted);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 3px 8px;
-        }
-
-        .voting-row {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 14px;
-        }
-
-        .agent-node.voter {
-            min-height: 132px;
-            padding: 14px 16px;
-        }
-
-        .agent-node.voter .agent-icon {
-            width: 32px;
-            height: 32px;
-            font-size: 16px;
-            border-radius: 8px;
-            margin-bottom: 6px;
-        }
-
-        .agent-node.voter .agent-name {
-            font-size: 0.85rem;
-        }
-
-        .agent-node.voter .agent-role {
-            font-size: 0.72rem;
-            margin-bottom: 6px;
-        }
-
-        .voter-verdict {
-            margin-top: 8px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.72rem;
-            font-weight: 600;
-            letter-spacing: 0.4px;
-            padding: 3px 8px;
-            border-radius: 6px;
-            display: inline-block;
-            background: var(--accent);
-            color: var(--muted-foreground);
-            border: 1px solid var(--border);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .voter-verdict.visible { opacity: 1; }
-        .voter-verdict.accept  { color: var(--success); background: var(--success-bg); border-color: hsla(158, 64%, 40%, 0.3); }
-        .voter-verdict.reject  { color: hsl(0, 72%, 45%);  background: hsla(0, 72%, 45%, 0.08); border-color: hsla(0, 72%, 45%, 0.3); }
-        .voter-verdict.counter { color: var(--warning);    background: hsla(25, 95%, 53%, 0.08); border-color: hsla(25, 95%, 53%, 0.3); }
-
-        /* Agent node card */
+        /* Agent card */
         .agent-node {
-            background: var(--background);
-            border: 1.5px solid var(--border);
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--gray-100);
+            border-radius: var(--radius);
             padding: 20px;
-            min-height: 148px;
             position: relative;
             transition: all 0.3s ease;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 1px 2px rgba(10, 21, 30, 0.04);
         }
 
         .agent-node.coordinator {
-            width: 280px;
-            min-height: 164px;
-            border-color: var(--primary);
-            background: var(--background);
-            box-shadow: 0 2px 12px hsla(243.4, 75.4%, 58.6%, 0.12);
+            width: 320px;
+            border-color: var(--navy);
+            background: rgba(255, 255, 255, 0.85);
+            box-shadow: 0 2px 8px rgba(23, 48, 68, 0.08);
         }
 
-        .agent-node.specialist {
-            border-color: var(--border);
-        }
-
-        /* Status states */
-        .agent-node.idle {
-            border-color: var(--border);
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+        .agent-node .status-indicator {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--gray-100);
+            transition: all 0.3s ease;
         }
 
         .agent-node.running {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px hsla(243.4, 75.4%, 58.6%, 0.15), 0 4px 16px hsla(243.4, 75.4%, 58.6%, 0.2);
-            animation: pulse 2s ease-in-out infinite;
+            border-color: var(--teal);
+            background: rgba(159, 243, 240, 0.15);
+            box-shadow: 0 0 0 3px rgba(0, 222, 204, 0.1), 0 4px 16px rgba(0, 222, 204, 0.15);
+        }
+
+        .agent-node.running .status-indicator {
+            background: var(--teal);
+            box-shadow: 0 0 0 4px rgba(0, 222, 204, 0.25);
+            animation: indicator-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes indicator-pulse {
+            0%, 100% { box-shadow: 0 0 0 4px rgba(0, 222, 204, 0.25); }
+            50% { box-shadow: 0 0 0 8px rgba(0, 222, 204, 0.1); }
         }
 
         .agent-node.completed {
             border-color: var(--success);
-            box-shadow: 0 0 0 3px hsla(158, 64%, 40%, 0.12), 0 4px 12px hsla(158, 64%, 40%, 0.1);
+            background: rgba(240, 253, 244, 0.6);
         }
 
-        @keyframes pulse {
-            0%, 100% {
-                box-shadow: 0 0 0 3px hsla(243.4, 75.4%, 58.6%, 0.15), 0 4px 16px hsla(243.4, 75.4%, 58.6%, 0.2);
-            }
-            50% {
-                box-shadow: 0 0 0 4px hsla(243.4, 75.4%, 58.6%, 0.25), 0 6px 24px hsla(243.4, 75.4%, 58.6%, 0.3);
-            }
+        .agent-node.completed .status-indicator {
+            background: var(--success);
         }
 
-        /* Agent content */
         .agent-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--accent);
-            border-radius: 10px;
+            width: 38px;
+            height: 38px;
+            background: var(--gray-light);
+            border-radius: var(--radius);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            margin-bottom: 10px;
+            font-size: 18px;
+            margin-bottom: 14px;
+            border: 1px solid var(--gray-100);
             transition: all 0.3s ease;
         }
 
-        .agent-node.idle .agent-icon {
-            background: var(--accent);
-        }
-
         .agent-node.running .agent-icon {
-            background: hsla(243.4, 75.4%, 58.6%, 0.12);
-            animation: icon-pulse 2s ease-in-out infinite;
+            background: var(--teal-light);
+            border-color: var(--teal);
         }
 
         .agent-node.completed .agent-icon {
             background: var(--success-bg);
-        }
-
-        @keyframes icon-pulse {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.08);
-            }
+            border-color: var(--success);
         }
 
         .agent-name {
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 600;
-            margin-bottom: 4px;
-            color: var(--foreground);
+            color: var(--black);
+            margin-bottom: 2px;
             letter-spacing: -0.01em;
         }
 
         .agent-role {
-            font-size: 0.8rem;
-            color: var(--muted-foreground);
-            margin-bottom: 10px;
+            font-size: 0.75rem;
+            color: var(--gray-cool);
+            margin-bottom: 14px;
         }
 
-        .agent-status {
-            font-size: 0.75rem;
-            color: var(--primary);
-            font-weight: 500;
+        .agent-status-text {
+            font-size: 0.65rem;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.6px;
+            color: var(--gray-medium);
         }
 
-        .agent-node.idle .agent-status {
-            color: var(--muted-foreground);
+        .agent-node.running .agent-status-text {
+            color: var(--teal-dark);
         }
 
-        .agent-node.completed .agent-status {
+        .agent-node.completed .agent-status-text {
             color: var(--success);
         }
 
-        /* Connection lines */
+        /* SVG connections */
         .connections {
             position: absolute;
             top: 0;
@@ -338,7 +325,7 @@
         }
 
         .connection-line {
-            stroke: var(--primary);
+            stroke: var(--teal);
             stroke-width: 2;
             fill: none;
             opacity: 0;
@@ -346,654 +333,463 @@
         }
 
         .connection-line.active {
-            opacity: 0.5;
-            animation: flow 1.5s ease-in-out;
+            opacity: 0.7;
+            animation: flow 1.2s ease-out;
         }
 
         @keyframes flow {
-            0% {
-                stroke-dashoffset: 1000;
-            }
-            100% {
-                stroke-dashoffset: 0;
-            }
-        }
-
-        /* Event stream sidebar */
-        .event-stream {
-            background: var(--background);
-            border-left: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .stream-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .stream-header h2 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--foreground);
-            margin-bottom: 2px;
-            letter-spacing: -0.01em;
-        }
-
-        .stream-header .count {
-            font-size: 0.8rem;
-            color: var(--muted-foreground);
-        }
-
-        .stream-events {
-            flex: 1;
-            overflow-y: auto;
-            padding: 12px;
-        }
-
-        .event-item {
-            padding: 10px 12px;
-            margin-bottom: 6px;
-            border-radius: 8px;
-            background: var(--muted);
-            border-left: 2.5px solid var(--border);
-            font-size: 0.825rem;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(12px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .event-item.thread-created {
-            border-left-color: var(--primary);
-            background: hsla(243.4, 75.4%, 58.6%, 0.05);
-        }
-
-        .event-item.thread-running {
-            border-left-color: var(--warning);
-            background: hsla(25, 95%, 53%, 0.05);
-        }
-
-        .event-item.reply {
-            border-left-color: var(--success);
-            background: var(--success-bg);
-        }
-
-        .event-item.delegate {
-            border-left-color: hsl(213, 94%, 68%);
-            background: hsla(213, 94%, 68%, 0.06);
-        }
-
-        .event-item.tool {
-            border-left-color: hsl(271, 50%, 60%);
-            background: hsla(271, 50%, 60%, 0.05);
-        }
-
-        .event-item.finished {
-            border-left-color: var(--success);
-            background: var(--success-bg);
-        }
-
-        .event-time {
-            color: var(--muted-foreground);
-            font-size: 0.7rem;
-            font-family: 'JetBrains Mono', monospace;
-            margin-right: 6px;
-        }
-
-        .event-type {
-            color: var(--primary);
-            font-weight: 600;
-            margin-right: 6px;
-        }
-
-        .event-content {
-            color: var(--foreground);
+            0% { stroke-dashoffset: 800; }
+            100% { stroke-dashoffset: 0; }
         }
 
         /* Timeline */
         .timeline {
-            position: absolute;
-            bottom: 20px;
-            left: 40px;
-            right: 40px;
-            height: 56px;
-            background: var(--background);
-            border-radius: 10px;
-            padding: 10px 16px;
-            border: 1px solid var(--border);
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+            flex-shrink: 0;
+            margin-top: 24px;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--gray-100);
+            border-radius: var(--radius);
+        }
+
+        .timeline-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
         }
 
         .timeline-label {
-            font-size: 0.75rem;
-            color: var(--muted-foreground);
+            font-size: 0.7rem;
+            color: var(--gray-cool);
             font-weight: 500;
-            margin-bottom: 6px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
+        .timeline-time {
+            font-size: 0.75rem;
+            color: var(--gray-cool);
+            font-family: 'JetBrains Mono', monospace;
+            font-variant-numeric: tabular-nums;
+        }
+
         .timeline-bar {
-            height: 8px;
-            background: var(--accent);
-            border-radius: 10px;
-            position: relative;
+            height: 4px;
+            background: var(--gray-light);
+            border-radius: 9999px;
             overflow: hidden;
         }
 
         .timeline-progress {
             height: 100%;
-            background: linear-gradient(90deg, var(--primary) 0%, hsl(213, 94%, 68%) 100%);
+            background: linear-gradient(90deg, var(--teal-dark), var(--teal));
             width: 0%;
             transition: width 0.5s ease;
-            border-radius: 10px;
+            border-radius: 9999px;
         }
 
-        /* Status badge */
-        .status-badge {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 6px 14px;
-            background: var(--background);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            font-size: 0.8rem;
+        /* Sidebar */
+        .event-stream {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            border-left: 1px solid var(--gray-100);
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            height: 100vh;
+        }
+
+        .stream-header {
+            padding: 22px 20px 16px;
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stream-header h2 {
+            font-size: 0.875rem;
             font-weight: 600;
-            color: var(--muted-foreground);
+            color: var(--black);
+            letter-spacing: -0.01em;
+            padding: 0;
         }
 
-        .status-badge.active {
-            border-color: var(--primary);
-            color: var(--primary);
-            background: hsla(243.4, 75.4%, 58.6%, 0.06);
+        .stream-count {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--gray-cool);
+            background: var(--gray-light);
+            border: 1px solid var(--gray-100);
+            padding: 2px 10px;
+            border-radius: 9999px;
+            font-variant-numeric: tabular-nums;
         }
 
-        /* Scrollbar styling */
-        .stream-events::-webkit-scrollbar {
-            width: 6px;
+        .stream-events {
+            flex: 1 1 0;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 8px;
         }
 
-        .stream-events::-webkit-scrollbar-track {
-            background: transparent;
+        .event-item {
+            padding: 10px 12px;
+            margin-bottom: 4px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            animation: slideIn 0.2s ease-out;
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            border: 1px solid transparent;
+            background: rgba(244, 246, 252, 0.6);
         }
 
-        .stream-events::-webkit-scrollbar-thumb {
-            background: var(--accent-hard);
-            border-radius: 4px;
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .stream-events::-webkit-scrollbar-thumb:hover {
-            background: hsl(220, 9%, 78%);
+        .event-item.thread-created {
+            background: rgba(159, 243, 240, 0.2);
+            border-color: rgba(0, 222, 204, 0.2);
         }
 
-        /* Loading state */
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--muted-foreground);
+        .event-item.thread-running {
+            background: var(--warning-bg);
+            border-color: rgba(234, 88, 12, 0.15);
         }
 
-        .loading-spinner {
-            width: 32px;
-            height: 32px;
-            border: 2.5px solid var(--accent-hard);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 12px;
+        .event-item.reply {
+            background: var(--success-bg);
+            border-color: rgba(22, 163, 74, 0.15);
         }
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+        .event-item.delegate {
+            background: var(--info-bg);
+            border-color: rgba(37, 99, 235, 0.15);
         }
 
-        /* Proposal overlay */
+        .event-item.tool {
+            background: rgba(244, 246, 252, 0.8);
+            border-color: var(--gray-100);
+        }
+
+        .event-item.finished {
+            background: var(--success-bg);
+            border-color: var(--success);
+        }
+
+        .event-time {
+            color: var(--gray-medium);
+            font-size: 0.65rem;
+            font-family: 'JetBrains Mono', monospace;
+            flex-shrink: 0;
+        }
+
+        .event-icon {
+            flex-shrink: 0;
+            font-size: 0.85rem;
+            color: var(--gray-cool);
+            font-weight: 600;
+        }
+
+        .event-item.thread-created .event-icon { color: var(--teal-dark); }
+        .event-item.reply .event-icon { color: var(--success); }
+        .event-item.delegate .event-icon { color: var(--info); }
+        .event-item.thread-running .event-icon { color: var(--warning); }
+
+        .event-content {
+            color: var(--black);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Footer button */
+        .stream-footer {
+            padding: 14px 16px;
+            border-top: 1px solid var(--gray-100);
+        }
+
+        .view-proposal-btn {
+            display: none;
+            width: 100%;
+            padding: 10px 16px;
+            background: var(--black);
+            color: white;
+            border: 1px solid var(--black);
+            border-radius: var(--radius);
+            font-family: 'Sora', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .view-proposal-btn:hover {
+            background: var(--navy);
+        }
+
+        .view-proposal-btn.visible { display: block; }
+
+        /* Proposal modal */
         .proposal-overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.35);
+            background: rgba(10, 21, 30, 0.5);
+            backdrop-filter: blur(6px);
             z-index: 100;
             align-items: center;
             justify-content: center;
             padding: 32px;
         }
 
-        .proposal-overlay.visible {
-            display: flex;
-        }
+        .proposal-overlay.visible { display: flex; }
 
         .proposal-modal {
-            background: var(--background);
-            border: 1px solid var(--border);
-            border-radius: 16px;
+            background: white;
+            border: 1px solid var(--gray-100);
+            border-radius: 12px;
             width: 100%;
-            max-width: 860px;
-            max-height: 90vh;
+            max-width: 800px;
+            max-height: 85vh;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-            animation: modalIn 0.25s ease-out;
+            box-shadow: 0 24px 48px rgba(10, 21, 30, 0.2);
+            animation: modalIn 0.2s ease-out;
         }
 
         @keyframes modalIn {
-            from { opacity: 0; transform: translateY(16px) scale(0.98); }
-            to   { opacity: 1; transform: translateY(0) scale(1); }
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .proposal-modal-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-100);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            flex-shrink: 0;
         }
 
         .proposal-modal-header h2 {
-            font-size: 1rem;
+            font-size: 0.875rem;
             font-weight: 600;
-            color: var(--foreground);
-            letter-spacing: -0.01em;
-        }
-
-        .proposal-modal-header .pill {
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            color: var(--primary);
-            background: hsla(243.4, 75.4%, 58.6%, 0.08);
-            border: 1px solid hsla(243.4, 75.4%, 58.6%, 0.2);
-            border-radius: 20px;
-            padding: 3px 10px;
+            color: var(--black);
+            padding: 0;
         }
 
         .proposal-close {
-            background: none;
-            border: none;
+            background: white;
+            border: 1px solid var(--gray-100);
             cursor: pointer;
-            color: var(--muted-foreground);
-            font-size: 1.2rem;
-            padding: 4px 8px;
+            color: var(--gray-cool);
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 5px 12px;
             border-radius: 6px;
-            transition: background 0.15s;
+            transition: all 0.15s;
+            font-family: 'Sora', sans-serif;
         }
 
         .proposal-close:hover {
-            background: var(--accent);
-            color: var(--foreground);
+            background: var(--gray-light);
+            color: var(--black);
         }
 
         .proposal-body {
             flex: 1;
             overflow-y: auto;
-            padding: 28px 32px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--accent-hard) transparent;
+            padding: 24px 28px;
         }
 
-        .proposal-body::-webkit-scrollbar { width: 6px; }
-        .proposal-body::-webkit-scrollbar-thumb { background: var(--accent-hard); border-radius: 4px; }
+        .proposal-body::-webkit-scrollbar { width: 4px; }
+        .proposal-body::-webkit-scrollbar-thumb { background: var(--gray-100); border-radius: 4px; }
 
-        /* Proposal markdown rendering */
-        .proposal-content {
-            font-size: 0.9rem;
-            line-height: 1.7;
-            color: var(--foreground);
-        }
+        .proposal-content { font-size: 0.875rem; line-height: 1.7; color: var(--black); }
+        .proposal-content h1 { font-size: 1.4rem; font-weight: 600; margin: 0 0 8px; padding: 0; letter-spacing: -0.02em; }
+        .proposal-content h2 { font-size: 1.05rem; font-weight: 600; margin: 24px 0 8px; padding: 0 0 6px; border-bottom: 1px solid var(--gray-100); letter-spacing: -0.01em; }
+        .proposal-content h3 { font-size: 0.9rem; font-weight: 600; margin: 16px 0 6px; padding: 0; }
+        .proposal-content p { margin: 0 0 12px; color: var(--gray-cool); }
+        .proposal-content strong { color: var(--black); font-weight: 600; }
+        .proposal-content ul, .proposal-content ol { margin: 0 0 12px; padding-left: 22px; color: var(--gray-cool); }
+        .proposal-content li { margin-bottom: 4px; }
+        .proposal-content table { width: 100%; border-collapse: collapse; margin: 0 0 16px; font-size: 0.82rem; }
+        .proposal-content th { background: var(--gray-light); font-weight: 600; text-align: left; padding: 8px 12px; border: 1px solid var(--gray-100); color: var(--black); }
+        .proposal-content td { padding: 8px 12px; border: 1px solid var(--gray-100); color: var(--gray-cool); }
+        .proposal-content code { font-family: 'JetBrains Mono', monospace; font-size: 0.82em; background: var(--gray-light); border: 1px solid var(--gray-100); border-radius: 4px; padding: 1px 5px; color: var(--black); }
+        .proposal-content blockquote { border-left: 3px solid var(--teal); margin: 0 0 12px; padding: 8px 16px; background: rgba(159, 243, 240, 0.15); border-radius: 0 6px 6px 0; }
 
-        .proposal-content h1 {
-            font-size: 1.4rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            color: var(--foreground);
-            margin: 0 0 6px;
-        }
+        .stream-events::-webkit-scrollbar { width: 4px; }
+        .stream-events::-webkit-scrollbar-track { background: transparent; }
+        .stream-events::-webkit-scrollbar-thumb { background: var(--gray-100); border-radius: 4px; }
 
-        .proposal-content h2 {
-            font-size: 1.05rem;
-            font-weight: 600;
-            letter-spacing: -0.01em;
-            color: var(--foreground);
-            margin: 28px 0 8px;
-            padding-bottom: 6px;
-            border-bottom: 1px solid var(--border);
+        .loading { text-align: center; padding: 40px 20px; color: var(--gray-cool); font-size: 0.8rem; }
+        .loading-spinner {
+            width: 24px; height: 24px;
+            border: 2px solid var(--gray-100);
+            border-top-color: var(--teal);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 10px;
         }
-
-        .proposal-content h3 {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--foreground);
-            margin: 18px 0 6px;
-        }
-
-        .proposal-content p {
-            margin: 0 0 12px;
-        }
-
-        .proposal-content strong {
-            font-weight: 600;
-            color: var(--foreground);
-        }
-
-        .proposal-content ul, .proposal-content ol {
-            margin: 0 0 12px;
-            padding-left: 20px;
-        }
-
-        .proposal-content li {
-            margin-bottom: 4px;
-        }
-
-        .proposal-content code {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.82em;
-            background: var(--accent);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 1px 5px;
-            color: var(--foreground);
-        }
-
-        .proposal-content pre {
-            background: var(--accent);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 14px 16px;
-            overflow-x: auto;
-            margin: 0 0 14px;
-        }
-
-        .proposal-content pre code {
-            background: none;
-            border: none;
-            padding: 0;
-            font-size: 0.82em;
-        }
-
-        .proposal-content blockquote {
-            border-left: 3px solid var(--primary);
-            margin: 0 0 12px;
-            padding: 8px 16px;
-            background: hsla(243.4, 75.4%, 58.6%, 0.04);
-            border-radius: 0 6px 6px 0;
-        }
-
-        .proposal-content table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85em;
-            margin: 0 0 16px;
-        }
-
-        .proposal-content th {
-            background: var(--accent);
-            font-weight: 600;
-            text-align: left;
-            padding: 8px 12px;
-            border: 1px solid var(--border);
-            color: var(--foreground);
-        }
-
-        .proposal-content td {
-            padding: 8px 12px;
-            border: 1px solid var(--border);
-            vertical-align: top;
-        }
-
-        .proposal-content tr:nth-child(even) td {
-            background: hsl(210, 20%, 99%);
-        }
-
-        /* "View Proposal" button that appears on completion */
-        .view-proposal-btn {
-            display: none;
-            margin-top: 12px;
-            padding: 8px 18px;
-            background: var(--primary);
-            color: var(--primary-foreground);
-            border: none;
-            border-radius: 8px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: opacity 0.15s;
-        }
-
-        .view-proposal-btn:hover {
-            opacity: 0.88;
-        }
-
-        .view-proposal-btn.visible {
-            display: inline-block;
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Main visualization area -->
         <div class="viz-area">
             <div class="header">
-                <h1>Deal Desk Swarm</h1>
-                <div class="subtitle">Real-Time Multi-Agent Orchestration</div>
-                <div class="stats">
-                    <span class="stat">
-                        <span class="stat-value" id="activeCount">0</span> Active
-                    </span>
-                    <span class="stat">
-                        <span class="stat-value" id="completedCount">0</span> Completed
-                    </span>
+                <div class="header-left">
+                    <div class="logo">Sia</div>
+                    <div class="header-title">
+                        <h1>Deal Desk Swarm</h1>
+                        <div class="subtitle">Multi-Agent Orchestration</div>
+                    </div>
+                </div>
+
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="activeCount">0</div>
+                        <div class="stat-label">Active</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="completedCount">0</div>
+                        <div class="stat-label">Complete</div>
+                    </div>
+                </div>
+
+                <div class="status-badge" id="statusBadge">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Initializing</span>
                 </div>
             </div>
 
-            <div class="status-badge" id="statusBadge">Initializing...</div>
-
-            <!-- SVG for connection lines -->
             <svg class="connections" id="connectionsSvg">
                 <defs>
-                    <marker id="arrowhead" markerWidth="10" markerHeight="7"
-                            refX="9" refY="3.5" orient="auto">
-                        <polygon points="0 0, 10 3.5, 0 7" fill="hsl(243.4, 75.4%, 58.6%)" />
+                    <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                        <polygon points="0 0, 8 3, 0 6" fill="#00decc"/>
                     </marker>
                 </defs>
             </svg>
 
             <div class="agents-container">
-                <!-- Coordinator -->
                 <div class="coordinator-row">
-                    <div class="agent-node coordinator idle" id="coordinator" data-agent="coordinator">
+                    <div class="agent-node coordinator idle" id="coordinator">
+                        <div class="status-indicator"></div>
                         <div class="agent-icon">🎯</div>
-                        <div class="agent-name">Coordinator</div>
-                        <div class="agent-role">Deal Desk Orchestrator</div>
-                        <div class="agent-status">Idle</div>
+                        <div class="agent-name">Senior Partner</div>
+                        <div class="agent-role">Deal Desk Coordinator</div>
+                        <div class="agent-status-text">Waiting</div>
                     </div>
                 </div>
 
-                <!-- Specialists -->
                 <div class="specialists-row">
-                    <div class="agent-node specialist idle" id="pricing" data-agent="pricing">
+                    <div class="agent-node specialist idle" id="pricing">
+                        <div class="status-indicator"></div>
                         <div class="agent-icon">💰</div>
                         <div class="agent-name">Pricing</div>
                         <div class="agent-role">Commercial Terms</div>
-                        <div class="agent-status">Idle</div>
+                        <div class="agent-status-text">Idle</div>
                     </div>
-
-                    <div class="agent-node specialist idle" id="legal" data-agent="legal">
+                    <div class="agent-node specialist idle" id="legal">
+                        <div class="status-indicator"></div>
                         <div class="agent-icon">⚖️</div>
                         <div class="agent-name">Legal</div>
                         <div class="agent-role">Contract Review</div>
-                        <div class="agent-status">Idle</div>
+                        <div class="agent-status-text">Idle</div>
                     </div>
-
-                    <div class="agent-node specialist idle" id="technical" data-agent="technical">
+                    <div class="agent-node specialist idle" id="technical">
+                        <div class="status-indicator"></div>
                         <div class="agent-icon">🔧</div>
                         <div class="agent-name">Technical Fit</div>
                         <div class="agent-role">Capability Assessment</div>
-                        <div class="agent-status">Idle</div>
+                        <div class="agent-status-text">Idle</div>
                     </div>
-
-                    <div class="agent-node specialist idle" id="competitive" data-agent="competitive">
-                        <div class="agent-icon">🎯</div>
+                    <div class="agent-node specialist idle" id="competitive">
+                        <div class="status-indicator"></div>
+                        <div class="agent-icon">📊</div>
                         <div class="agent-name">Competitive</div>
                         <div class="agent-role">Market Intelligence</div>
-                        <div class="agent-status">Idle</div>
-                    </div>
-                </div>
-
-                <!-- Voting panel — convenes on contentious legal calls -->
-                <div class="voting-panel" id="votingPanel">
-                    <div class="voting-panel-header">
-                        <div class="voting-panel-title">
-                            🗳️ Legal Voting Panel
-                            <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted-foreground);">
-                                — convenes on contentious clauses
-                            </span>
-                        </div>
-                        <div class="voting-panel-tally" id="votingTally">Awaiting panel</div>
-                    </div>
-                    <div class="voting-row">
-                        <div class="agent-node voter idle" id="legal_conservative" data-agent="legal_conservative">
-                            <div class="agent-icon">🛡️</div>
-                            <div class="agent-name">Conservative</div>
-                            <div class="agent-role">Risk-averse</div>
-                            <div class="agent-status">Idle</div>
-                            <div class="voter-verdict" id="verdict_legal_conservative">—</div>
-                        </div>
-
-                        <div class="agent-node voter idle" id="legal_balanced" data-agent="legal_balanced">
-                            <div class="agent-icon">⚖️</div>
-                            <div class="agent-name">Balanced</div>
-                            <div class="agent-role">Pragmatist</div>
-                            <div class="agent-status">Idle</div>
-                            <div class="voter-verdict" id="verdict_legal_balanced">—</div>
-                        </div>
-
-                        <div class="agent-node voter idle" id="legal_aggressive" data-agent="legal_aggressive">
-                            <div class="agent-icon">🚀</div>
-                            <div class="agent-name">Aggressive</div>
-                            <div class="agent-role">Deal-friendly</div>
-                            <div class="agent-status">Idle</div>
-                            <div class="voter-verdict" id="verdict_legal_aggressive">—</div>
-                        </div>
+                        <div class="agent-status-text">Idle</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Timeline -->
             <div class="timeline">
-                <div class="timeline-label">Execution Timeline</div>
+                <div class="timeline-top">
+                    <span class="timeline-label">Execution</span>
+                    <span class="timeline-time" id="timelineTime">0.0s</span>
+                </div>
                 <div class="timeline-bar">
                     <div class="timeline-progress" id="timelineProgress"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Event stream sidebar -->
         <div class="event-stream">
             <div class="stream-header">
                 <h2>Event Stream</h2>
-                <div class="count"><span id="eventCount">0</span> events</div>
-                <button class="view-proposal-btn" id="viewProposalBtn" onclick="openProposal()">View Proposal →</button>
+                <span class="stream-count" id="eventCount">0</span>
             </div>
             <div class="stream-events" id="streamEvents">
                 <div class="loading">
                     <div class="loading-spinner"></div>
-                    Waiting for swarm to start...
+                    Connecting to swarm...
                 </div>
+            </div>
+            <div class="stream-footer">
+                <button class="view-proposal-btn" id="viewProposalBtn" onclick="openProposal()">View Proposal</button>
             </div>
         </div>
     </div>
 
-    <!-- Proposal modal -->
     <div class="proposal-overlay" id="proposalOverlay" onclick="closeProposalIfOutside(event)">
         <div class="proposal-modal">
             <div class="proposal-modal-header">
                 <h2>Proposal Response</h2>
-                <div style="display:flex;align-items:center;gap:10px;">
-                    <span class="pill">Deal Desk Output</span>
-                    <button class="proposal-close" onclick="closeProposal()" title="Close">✕</button>
-                </div>
+                <button class="proposal-close" onclick="closeProposal()">Close</button>
             </div>
             <div class="proposal-body">
-                <div class="proposal-content" id="proposalContent">
-                    <div class="loading"><div class="loading-spinner"></div>Loading proposal...</div>
-                </div>
+                <div class="proposal-content" id="proposalContent"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // Agent name mapping (handles various naming conventions)
         const agentMapping = {
             'coordinator': 'coordinator',
             'Coordinator': 'coordinator',
-            'Deal Desk Orchestrator': 'coordinator',
             'Deal Desk Senior Partner': 'coordinator',
+            'Deal Desk Orchestrator': 'coordinator',
             'Pricing Specialist': 'pricing',
-            'pricing-specialist': 'pricing',
             'Legal Reviewer': 'legal',
-            'legal-reviewer': 'legal',
             'Technical Fit Specialist': 'technical',
-            'technical-fit-specialist': 'technical',
             'Competitive Intel Analyst': 'competitive',
-            'competitive-intel-analyst': 'competitive',
-            // S9 — Legal voting panel
-            'Legal Reviewer — Conservative': 'legal_conservative',
-            'Legal Reviewer - Conservative': 'legal_conservative',
-            'legal-reviewer-conservative': 'legal_conservative',
-            'Legal Reviewer — Balanced': 'legal_balanced',
-            'Legal Reviewer - Balanced': 'legal_balanced',
-            'legal-reviewer-balanced': 'legal_balanced',
-            'Legal Reviewer — Aggressive': 'legal_aggressive',
-            'Legal Reviewer - Aggressive': 'legal_aggressive',
-            'legal-reviewer-aggressive': 'legal_aggressive',
         };
 
-        const VOTER_KEYS = ['legal_conservative', 'legal_balanced', 'legal_aggressive'];
-        const verdicts = {}; // agentKey -> 'ACCEPT' | 'REJECT' | 'COUNTER'
-
-        // State
         let eventCount = 0;
         let startTime = null;
         let activeAgents = new Set();
         let completedAgents = new Set();
 
-        // DOM elements
         const streamEvents = document.getElementById('streamEvents');
         const eventCountEl = document.getElementById('eventCount');
         const statusBadge = document.getElementById('statusBadge');
         const timelineProgress = document.getElementById('timelineProgress');
+        const timelineTime = document.getElementById('timelineTime');
         const connectionsSvg = document.getElementById('connectionsSvg');
         const activeCountEl = document.getElementById('activeCount');
         const completedCountEl = document.getElementById('completedCount');
 
-        // Connect to SSE stream
         const eventSource = new EventSource('/stream');
 
-        eventSource.onopen = () => {
-            console.log('Connected to event stream');
-            updateStatusBadge('Connected', true);
-        };
-
-        eventSource.onerror = (error) => {
-            console.error('EventSource error:', error);
-            updateStatusBadge('Connection Error', false);
-        };
+        eventSource.onopen = () => updateStatusBadge('Connected', true);
+        eventSource.onerror = () => updateStatusBadge('Disconnected', false);
 
         eventSource.onmessage = (event) => {
             const data = JSON.parse(event.data);
@@ -1005,429 +801,195 @@
             handleEvent(data);
         };
 
-        // Handle incoming events
         function handleEvent(event) {
             if (!startTime) {
                 startTime = Date.now();
                 streamEvents.innerHTML = '';
             }
-
             const eventType = event.type;
-
             if (eventType === 'session.status_idle') {
                 eventSource.close();
                 updateStatusBadge('Complete', true);
             }
-
-            // Update event count
             eventCount++;
             eventCountEl.textContent = eventCount;
-
-            // Add event to stream
             addEventToStream(event);
 
-            // Update visualization based on event type
             switch (eventType) {
-                case 'session.thread_created':
-                    handleThreadCreated(event);
-                    break;
-                case 'session.thread_status_running':
-                    handleThreadRunning(event);
-                    break;
-                case 'agent.thread_message_received':
-                    handleMessageReceived(event);
-                    break;
-                case 'agent.thread_message_sent':
-                    handleMessageSent(event);
-                    break;
-                case 'agent.tool_use':
-                    handleToolUse(event);
-                    break;
-                case 'session.status_idle':
-                    handleSwarmFinished();
-                    break;
+                case 'session.thread_created': handleThreadCreated(event); break;
+                case 'session.thread_status_running': handleThreadRunning(event); break;
+                case 'agent.thread_message_received': handleMessageReceived(event); break;
+                case 'agent.thread_message_sent': handleMessageSent(event); break;
+                case 'session.status_idle': handleSwarmFinished(); break;
             }
-
-            // Update timeline
             updateTimeline();
         }
 
-        // Add event to stream sidebar
         function addEventToStream(event) {
-            const eventEl = document.createElement('div');
-            const time = new Date().toLocaleTimeString();
-            const eventType = event.type;
-
-            let className = 'event-item';
+            const el = document.createElement('div');
+            const time = new Date().toLocaleTimeString('en-US', {hour12:false, hour:'2-digit', minute:'2-digit', second:'2-digit'});
+            const t = event.type;
+            let cls = 'event-item';
             let icon = '';
-            let message = '';
+            let msg = '';
 
-            if (eventType === 'session.thread_created') {
-                className += ' thread-created';
-                icon = '🚀';
-                message = `Thread spawned: ${event.agent_name}`;
-            } else if (eventType === 'session.thread_status_running') {
-                className += ' thread-running';
-                icon = '⚡';
-                message = `Running: ${event.agent_name || '?'}`;
-            } else if (eventType === 'agent.thread_message_received') {
-                className += ' reply';
-                icon = '⬅️';
-                message = `Reply from: ${event.from_agent_name}`;
-                if (event.verdict) {
-                    message += ` — <strong>VERDICT: ${event.verdict}</strong>`;
-                }
-            } else if (eventType === 'agent.thread_message_sent') {
-                className += ' delegate';
-                icon = '➡️';
-                message = `Delegate to: ${event.to_agent_name}`;
-            } else if (eventType === 'agent.tool_use') {
-                className += ' tool';
-                icon = '🔧';
-                message = `Tool: ${event.name || '?'}`;
-            } else if (eventType === 'session.status_idle') {
-                className += ' finished';
-                icon = '✅';
-                message = 'Swarm finished';
-            }
+            if (t === 'session.thread_created') { cls += ' thread-created'; icon = '◉'; msg = event.agent_name || '?'; }
+            else if (t === 'session.thread_status_running') { cls += ' thread-running'; icon = '▶'; msg = event.agent_name || '?'; }
+            else if (t === 'agent.thread_message_received') { cls += ' reply'; icon = '←'; msg = event.from_agent_name || '?'; }
+            else if (t === 'agent.thread_message_sent') { cls += ' delegate'; icon = '→'; msg = event.to_agent_name || '?'; }
+            else if (t === 'agent.tool_use') { cls += ' tool'; icon = '⚙'; msg = event.name || 'tool'; }
+            else if (t === 'session.status_idle') { cls += ' finished'; icon = '✓'; msg = 'Swarm complete'; }
+            else { icon = '·'; msg = t; }
 
-            eventEl.className = className;
-            eventEl.innerHTML = `
-                <span class="event-time">${time}</span>
-                <span class="event-type">${icon}</span>
-                <span class="event-content">${message}</span>
-            `;
-
-            streamEvents.insertBefore(eventEl, streamEvents.firstChild);
-
-            // Limit to 100 events
-            while (streamEvents.children.length > 100) {
-                streamEvents.removeChild(streamEvents.lastChild);
-            }
+            el.className = cls;
+            el.innerHTML = `<span class="event-time">${time}</span><span class="event-icon">${icon}</span><span class="event-content">${msg}</span>`;
+            streamEvents.insertBefore(el, streamEvents.firstChild);
+            while (streamEvents.children.length > 80) streamEvents.removeChild(streamEvents.lastChild);
         }
 
-        // Handle thread created
         function handleThreadCreated(event) {
-            const agentKey = getAgentKey(event.agent_name);
-            if (agentKey) {
-                const node = document.getElementById(agentKey);
-                if (node) {
-                    updateAgentStatus(node, 'idle');
-                }
-            }
+            const key = getAgentKey(event.agent_name);
+            if (key) updateAgentStatus(key, 'idle');
         }
 
-        // Handle thread running
         function handleThreadRunning(event) {
-            const agentKey = getAgentKey(event.agent_name);
-            if (agentKey) {
-                const node = document.getElementById(agentKey);
-                if (node) {
-                    updateAgentStatus(node, 'running');
-                    activeAgents.add(agentKey);
-                }
-                if (VOTER_KEYS.includes(agentKey)) armVotingPanel();
+            const key = getAgentKey(event.agent_name);
+            if (key) {
+                updateAgentStatus(key, 'running');
+                activeAgents.add(key);
             }
             updateStatusBadge('Running', true);
         }
 
-        // Handle message received
         function handleMessageReceived(event) {
-            const fromKey = getAgentKey(event.from_agent_name);
-            if (fromKey) {
-                const node = document.getElementById(fromKey);
-                if (node) {
-                    updateAgentStatus(node, 'completed');
-                    completedAgents.add(fromKey);
-                    activeAgents.delete(fromKey);
-                }
-
-                // Capture and display the voter's verdict, if any
-                if (VOTER_KEYS.includes(fromKey)) {
-                    armVotingPanel();
-                    if (event.verdict) recordVerdict(fromKey, event.verdict);
-                }
-
-                // Draw connection line back to coordinator
-                drawConnection(fromKey, 'coordinator');
+            const key = getAgentKey(event.from_agent_name);
+            if (key) {
+                updateAgentStatus(key, 'completed');
+                completedAgents.add(key);
+                activeAgents.delete(key);
+                drawConnection(key, 'coordinator');
             }
         }
 
-        // Voting panel helpers
-        function armVotingPanel() {
-            const panel = document.getElementById('votingPanel');
-            if (panel) panel.classList.add('armed');
-            updateVotingTally();
-        }
-
-        function recordVerdict(agentKey, verdict) {
-            verdicts[agentKey] = verdict;
-            const el = document.getElementById('verdict_' + agentKey);
-            if (el) {
-                el.textContent = verdict;
-                el.classList.remove('accept', 'reject', 'counter');
-                el.classList.add('visible', verdict.toLowerCase());
-            }
-            updateVotingTally();
-        }
-
-        function updateVotingTally() {
-            const tallyEl = document.getElementById('votingTally');
-            if (!tallyEl) return;
-            const counts = { ACCEPT: 0, REJECT: 0, COUNTER: 0 };
-            VOTER_KEYS.forEach(k => { if (verdicts[k]) counts[verdicts[k]]++; });
-            const cast = counts.ACCEPT + counts.REJECT + counts.COUNTER;
-            if (cast === 0) {
-                tallyEl.textContent = 'Panel convened — awaiting votes';
-                return;
-            }
-            const parts = [];
-            if (counts.ACCEPT)  parts.push(`${counts.ACCEPT}× ACCEPT`);
-            if (counts.COUNTER) parts.push(`${counts.COUNTER}× COUNTER`);
-            if (counts.REJECT)  parts.push(`${counts.REJECT}× REJECT`);
-            tallyEl.textContent = `${cast}/3 · ${parts.join(' · ')}`;
-        }
-
-        // Handle message sent
         function handleMessageSent(event) {
-            const toKey = getAgentKey(event.to_agent_name);
-            if (toKey) {
-                // Draw connection line from coordinator to specialist
-                drawConnection('coordinator', toKey);
-            }
+            const key = getAgentKey(event.to_agent_name);
+            if (key) drawConnection('coordinator', key);
         }
 
-        // Handle tool use
-        function handleToolUse(event) {
-            // Just update the event stream, handled by addEventToStream
-        }
-
-        // Handle swarm finished
         function handleSwarmFinished() {
-            updateStatusBadge('Completed ✓', true);
+            updateStatusBadge('Complete', true);
             timelineProgress.style.width = '100%';
-
-            // Mark all remaining active agents as completed
-            activeAgents.forEach(agentKey => {
-                const node = document.getElementById(agentKey);
-                if (node) {
-                    updateAgentStatus(node, 'completed');
-                }
-            });
+            activeAgents.forEach(k => updateAgentStatus(k, 'completed'));
             activeAgents.clear();
-
-            // Show "View Proposal" button
             document.getElementById('viewProposalBtn').classList.add('visible');
         }
 
-        // Proposal modal
-        async function openProposal() {
-            document.getElementById('proposalOverlay').classList.add('visible');
-            const contentEl = document.getElementById('proposalContent');
-            contentEl.innerHTML = '<div class="loading"><div class="loading-spinner"></div>Loading proposal...</div>';
-
-            try {
-                const res = await fetch('/output');
-                if (!res.ok) {
-                    contentEl.innerHTML = '<p style="color:var(--muted-foreground)">Proposal not available yet. The swarm is still running.</p>';
-                    return;
-                }
-                const data = await res.json();
-                if (data.status === 'ready' && data.content) {
-                    contentEl.innerHTML = renderMarkdown(data.content);
-                } else {
-                    contentEl.innerHTML = '<p style="color:var(--muted-foreground)">Proposal not available yet.</p>';
-                }
-            } catch (e) {
-                contentEl.innerHTML = '<p style="color:var(--muted-foreground)">Proposal not available yet.</p>';
-            }
-        }
-
-        function closeProposal() {
-            document.getElementById('proposalOverlay').classList.remove('visible');
-        }
-
-        function closeProposalIfOutside(e) {
-            if (e.target === document.getElementById('proposalOverlay')) closeProposal();
-        }
-
-        // Minimal markdown renderer (headings, bold, lists, code, tables, hr)
-        function renderMarkdown(text) {
-            const lines = text.split('\n');
-            let html = '';
-            let inPre = false;
-            let inTable = false;
-            let inList = false;
-            let listTag = '';
-
-            const escapeHtml = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-
-            const inlineFormat = s => s
-                .replace(/`([^`]+)`/g, '<code>$1</code>')
-                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-                .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-                .replace(/~~([^~]+)~~/g, '<del>$1</del>');
-
-            for (let i = 0; i < lines.length; i++) {
-                const raw = lines[i];
-                const line = raw;
-
-                if (line.startsWith('```')) {
-                    if (inList) { html += `</${listTag}>`; inList = false; }
-                    if (inTable) { html += '</table>'; inTable = false; }
-                    inPre = !inPre;
-                    html += inPre ? '<pre><code>' : '</code></pre>';
-                    continue;
-                }
-                if (inPre) { html += escapeHtml(line) + '\n'; continue; }
-
-                // Tables
-                if (line.includes('|') && line.trim().startsWith('|')) {
-                    if (inList) { html += `</${listTag}>`; inList = false; }
-                    const cols = line.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
-                    const nextLine = lines[i + 1] || '';
-                    const isSep = /^\|[-| :]+\|$/.test(nextLine.trim());
-                    if (isSep) {
-                        if (!inTable) { html += '<table>'; inTable = true; }
-                        html += '<tr>' + cols.map(c => `<th>${inlineFormat(escapeHtml(c))}</th>`).join('') + '</tr>';
-                        i++; // skip separator
-                        continue;
-                    }
-                    if (inTable) {
-                        if (line.trim() === '' || !line.includes('|')) { html += '</table>'; inTable = false; }
-                        else { html += '<tr>' + cols.map(c => `<td>${inlineFormat(escapeHtml(c))}</td>`).join('') + '</tr>'; continue; }
-                    }
-                }
-                if (inTable && !line.includes('|')) { html += '</table>'; inTable = false; }
-
-                if (line === '') {
-                    if (inList) { html += `</${listTag}>`; inList = false; }
-                    html += '';
-                    continue;
-                }
-
-                // Headings
-                const h3 = line.match(/^### (.+)/);
-                const h2 = line.match(/^## (.+)/);
-                const h1 = line.match(/^# (.+)/);
-                if (h1) { if (inList) { html += `</${listTag}>`; inList = false; } html += `<h1>${inlineFormat(escapeHtml(h1[1]))}</h1>`; continue; }
-                if (h2) { if (inList) { html += `</${listTag}>`; inList = false; } html += `<h2>${inlineFormat(escapeHtml(h2[1]))}</h2>`; continue; }
-                if (h3) { if (inList) { html += `</${listTag}>`; inList = false; } html += `<h3>${inlineFormat(escapeHtml(h3[1]))}</h3>`; continue; }
-
-                // HR
-                if (/^(-{3,}|\*{3,}|_{3,})$/.test(line.trim())) { html += '<hr>'; continue; }
-
-                // Blockquote
-                const bq = line.match(/^> (.+)/);
-                if (bq) { if (inList) { html += `</${listTag}>`; inList = false; } html += `<blockquote><p>${inlineFormat(escapeHtml(bq[1]))}</p></blockquote>`; continue; }
-
-                // Lists
-                const ul = line.match(/^[-*+] (.+)/);
-                const ol = line.match(/^\d+\. (.+)/);
-                if (ul) {
-                    if (!inList || listTag !== 'ul') { if (inList) html += `</${listTag}>`; html += '<ul>'; inList = true; listTag = 'ul'; }
-                    html += `<li>${inlineFormat(escapeHtml(ul[1]))}</li>`;
-                    continue;
-                }
-                if (ol) {
-                    if (!inList || listTag !== 'ol') { if (inList) html += `</${listTag}>`; html += '<ol>'; inList = true; listTag = 'ol'; }
-                    html += `<li>${inlineFormat(escapeHtml(ol[1]))}</li>`;
-                    continue;
-                }
-
-                if (inList) { html += `</${listTag}>`; inList = false; }
-                html += `<p>${inlineFormat(escapeHtml(line))}</p>`;
-            }
-
-            if (inPre) html += '</code></pre>';
-            if (inList) html += `</${listTag}>`;
-            if (inTable) html += '</table>';
-
-            return html;
-        }
-
-        // Update agent status
-        function updateAgentStatus(node, status) {
+        function updateAgentStatus(key, status) {
+            const node = document.getElementById(key);
+            if (!node) return;
             node.classList.remove('idle', 'running', 'completed');
             node.classList.add(status);
-
-            const statusEl = node.querySelector('.agent-status');
-            if (statusEl) {
-                statusEl.textContent = status.charAt(0).toUpperCase() + status.slice(1);
-            }
-
-            // Update stats
+            const txt = node.querySelector('.agent-status-text');
+            if (txt) txt.textContent = status === 'running' ? 'Processing' : status === 'completed' ? 'Done' : 'Idle';
             updateStats();
         }
 
-        // Update statistics in header
         function updateStats() {
             activeCountEl.textContent = activeAgents.size;
             completedCountEl.textContent = completedAgents.size;
         }
 
-        // Draw connection line between agents
         function drawConnection(fromKey, toKey) {
-            const fromNode = document.getElementById(fromKey);
-            const toNode = document.getElementById(toKey);
-
-            if (!fromNode || !toNode) return;
-
-            const fromRect = fromNode.getBoundingClientRect();
-            const toRect = toNode.getBoundingClientRect();
-            const svgRect = connectionsSvg.getBoundingClientRect();
-
-            const x1 = fromRect.left + fromRect.width / 2 - svgRect.left;
-            const y1 = fromRect.top + fromRect.height / 2 - svgRect.top;
-            const x2 = toRect.left + toRect.width / 2 - svgRect.left;
-            const y2 = toRect.top + toRect.height / 2 - svgRect.top;
+            const from = document.getElementById(fromKey);
+            const to = document.getElementById(toKey);
+            if (!from || !to) return;
+            const fr = from.getBoundingClientRect();
+            const tr = to.getBoundingClientRect();
+            const sr = connectionsSvg.getBoundingClientRect();
+            const x1 = fr.left + fr.width/2 - sr.left;
+            const y1 = fr.top + fr.height/2 - sr.top;
+            const x2 = tr.left + tr.width/2 - sr.left;
+            const y2 = tr.top + tr.height/2 - sr.top;
 
             const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            const d = `M ${x1} ${y1} Q ${(x1 + x2) / 2} ${(y1 + y2) / 2} ${x2} ${y2}`;
-
-            line.setAttribute('d', d);
+            const midY = (y1 + y2) / 2;
+            line.setAttribute('d', `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`);
             line.setAttribute('class', 'connection-line active');
-            line.setAttribute('stroke-dasharray', '1000');
-            line.setAttribute('stroke-dashoffset', '1000');
+            line.setAttribute('stroke-dasharray', '800');
+            line.setAttribute('stroke-dashoffset', '800');
             line.setAttribute('marker-end', 'url(#arrowhead)');
-
             connectionsSvg.appendChild(line);
-
-            // Remove line after animation
             setTimeout(() => {
                 line.classList.remove('active');
                 setTimeout(() => line.remove(), 300);
-            }, 1500);
+            }, 1200);
         }
 
-        // Update timeline progress
         function updateTimeline() {
             if (!startTime) return;
-
-            const elapsed = Date.now() - startTime;
-            const estimatedTotal = 60000; // 60 seconds estimated
-            const progress = Math.min((elapsed / estimatedTotal) * 100, 95);
-
-            timelineProgress.style.width = `${progress}%`;
+            const elapsed = (Date.now() - startTime) / 1000;
+            timelineTime.textContent = elapsed.toFixed(1) + 's';
+            const progress = Math.min((elapsed / 60) * 100, 95);
+            timelineProgress.style.width = progress + '%';
         }
 
-        // Update status badge
         function updateStatusBadge(text, active) {
-            statusBadge.textContent = text;
-            if (active) {
-                statusBadge.classList.add('active');
-            } else {
-                statusBadge.classList.remove('active');
+            statusBadge.querySelector('.status-text').textContent = text;
+            statusBadge.classList.toggle('active', active);
+        }
+
+        function getAgentKey(name) { return agentMapping[name] || null; }
+
+        setInterval(updateTimeline, 200);
+
+        async function openProposal() {
+            document.getElementById('proposalOverlay').classList.add('visible');
+            const el = document.getElementById('proposalContent');
+            el.innerHTML = '<div class="loading"><div class="loading-spinner"></div>Loading...</div>';
+            try {
+                const res = await fetch('/output');
+                if (!res.ok) { el.innerHTML = '<p>Proposal not ready yet.</p>'; return; }
+                const data = await res.json();
+                if (data.status === 'ready' && data.content) el.innerHTML = renderMarkdown(data.content);
+                else el.innerHTML = '<p>Proposal not available.</p>';
+            } catch (e) { el.innerHTML = '<p>Proposal not available.</p>'; }
+        }
+
+        function closeProposal() { document.getElementById('proposalOverlay').classList.remove('visible'); }
+        function closeProposalIfOutside(e) { if (e.target === document.getElementById('proposalOverlay')) closeProposal(); }
+
+        function renderMarkdown(text) {
+            const lines = text.split('\n');
+            let html = '', inPre = false, inList = false, listTag = '';
+            const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            const inl = s => s.replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\*([^*]+)\*/g,'<em>$1</em>');
+
+            for (let i = 0; i < lines.length; i++) {
+                const l = lines[i];
+                if (l.startsWith('```')) { if (inList) { html += `</${listTag}>`; inList = false; } inPre = !inPre; html += inPre ? '<pre><code>' : '</code></pre>'; continue; }
+                if (inPre) { html += esc(l) + '\n'; continue; }
+                if (l.includes('|') && l.trim().startsWith('|')) {
+                    const cols = l.trim().replace(/^\||\|$/g,'').split('|').map(c=>c.trim());
+                    const next = lines[i+1]||'';
+                    if (/^\|[-| :]+\|$/.test(next.trim())) { html += '<table><tr>'+cols.map(c=>`<th>${inl(esc(c))}</th>`).join('')+'</tr>'; i++; continue; }
+                    if (html.includes('<table>')) { html += '<tr>'+cols.map(c=>`<td>${inl(esc(c))}</td>`).join('')+'</tr>'; continue; }
+                }
+                if (html.endsWith('</tr>') && !l.includes('|')) html += '</table>';
+                if (l === '') { if (inList) { html += `</${listTag}>`; inList = false; } continue; }
+                const h1 = l.match(/^# (.+)/); if (h1) { html += `<h1>${inl(esc(h1[1]))}</h1>`; continue; }
+                const h2 = l.match(/^## (.+)/); if (h2) { html += `<h2>${inl(esc(h2[1]))}</h2>`; continue; }
+                const h3 = l.match(/^### (.+)/); if (h3) { html += `<h3>${inl(esc(h3[1]))}</h3>`; continue; }
+                const ul = l.match(/^[-*] (.+)/);
+                if (ul) { if (!inList) { html += '<ul>'; inList = true; listTag = 'ul'; } html += `<li>${inl(esc(ul[1]))}</li>`; continue; }
+                const ol = l.match(/^\d+\. (.+)/);
+                if (ol) { if (!inList) { html += '<ol>'; inList = true; listTag = 'ol'; } html += `<li>${inl(esc(ol[1]))}</li>`; continue; }
+                if (inList) { html += `</${listTag}>`; inList = false; }
+                html += `<p>${inl(esc(l))}</p>`;
             }
+            if (inPre) html += '</code></pre>';
+            if (inList) html += `</${listTag}>`;
+            return html;
         }
-
-        // Get agent key from agent name
-        function getAgentKey(agentName) {
-            return agentMapping[agentName] || null;
-        }
-
-        // Update timeline periodically
-        setInterval(updateTimeline, 1000);
     </script>
 </body>
 </html>

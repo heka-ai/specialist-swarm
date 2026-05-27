@@ -12,12 +12,73 @@ Usage:
 """
 
 import os
+import time
 from pathlib import Path
 
 from dotenv import load_dotenv
 load_dotenv()
 
 from anthropic import Anthropic
+
+# ── ANSI colours ────────────────────────────────────────────────────────────
+RESET  = "\033[0m"
+BOLD   = "\033[1m"
+DIM    = "\033[2m"
+CYAN   = "\033[36m"
+GREEN  = "\033[32m"
+YELLOW = "\033[33m"
+MAGENTA= "\033[35m"
+RED    = "\033[31m"
+BLUE   = "\033[34m"
+WHITE  = "\033[37m"
+
+# Agent name → colour so threads are visually distinct
+_AGENT_COLOURS = [CYAN, GREEN, YELLOW, MAGENTA, BLUE]
+_agent_colour_map: dict[str, str] = {}
+
+def _agent_colour(name: str | None) -> str:
+    if not name:
+        return WHITE
+    if name not in _agent_colour_map:
+        idx = len(_agent_colour_map) % len(_AGENT_COLOURS)
+        _agent_colour_map[name] = _AGENT_COLOURS[idx]
+    return _agent_colour_map[name]
+
+_start_time: float = 0.0
+
+def _ts() -> str:
+    """Elapsed seconds since session start, e.g. '+12.3s'."""
+    elapsed = time.time() - _start_time
+    return f"{DIM}+{elapsed:5.1f}s{RESET}"
+
+def _preview(content: list, max_chars: int = 120) -> str:
+    """Extract a short text preview from a content block list."""
+    parts = []
+    for block in content:
+        text = getattr(block, "text", None)
+        if text:
+            parts.append(text)
+    combined = " ".join(parts).replace("\n", " ")
+    if len(combined) > max_chars:
+        combined = combined[:max_chars] + "…"
+    return combined
+
+def _tool_summary(name: str, inp: dict) -> str:
+    """Return the most readable snippet from a tool's input dict."""
+    keys_of_interest = ["command", "query", "url", "path", "filename", "content", "prompt", "text", "code"]
+    for key in keys_of_interest:
+        val = inp.get(key)
+        if val and isinstance(val, str):
+            snippet = val.replace("\n", " ")[:100]
+            if len(val) > 100:
+                snippet += "…"
+            return f"{DIM}{key}={snippet}{RESET}"
+    # Fall back to first key
+    if inp:
+        k, v = next(iter(inp.items()))
+        snippet = str(v).replace("\n", " ")[:100]
+        return f"{DIM}{k}={snippet}{RESET}"
+    return ""
 
 
 RFP_PATH = Path("synthetic-data/rfp-acme-corp.md")
@@ -79,8 +140,13 @@ def main() -> None:
     )
 
     # Stream the events — this is the demo. Watch for parallel thread spawns.
-    print("\n=== EVENT STREAM (this is the demo) ===\n")
+    global _start_time
+    _start_time = time.time()
+    print(f"\n{BOLD}{'─'*60}{RESET}")
+    print(f"{BOLD}  DEAL DESK SWARM — LIVE EVENT STREAM{RESET}")
+    print(f"{BOLD}{'─'*60}{RESET}\n")
     final_text_parts: list[str] = []
+    thinking_count: dict[str, int] = {}
 
     with client.beta.sessions.events.stream(session.id) as stream:
         client.beta.sessions.events.send(
@@ -94,25 +160,91 @@ def main() -> None:
         )
         for event in stream:
             t = event.type
+
+            # ── Thread lifecycle ─────────────────────────────────────────
             if t == "session.thread_created":
-                print(f"  [thread spawned]   {event.agent_name}", flush=True)
+                c = _agent_colour(event.agent_name)
+                print(f"{_ts()}  {c}{BOLD}SPAWN{RESET}   {c}{event.agent_name}{RESET}  {DIM}(thread {event.session_thread_id}){RESET}", flush=True)
+
             elif t == "session.thread_status_running":
                 name = getattr(event, "agent_name", "?")
-                print(f"  [thread running]   {name}", flush=True)
-            elif t == "agent.thread_message_received":
-                print(f"  [reply ←]          {event.from_agent_name}", flush=True)
+                c = _agent_colour(name)
+                print(f"{_ts()}  {c}▶ RUNNING{RESET}  {c}{name}{RESET}", flush=True)
+
+            elif t == "session.thread_status_idle":
+                name = getattr(event, "agent_name", "?")
+                c = _agent_colour(name)
+                print(f"{_ts()}  {c}■ IDLE{RESET}     {c}{name}{RESET}", flush=True)
+
+            # ── Agent-to-agent messages ──────────────────────────────────
             elif t == "agent.thread_message_sent":
-                print(f"  [delegate →]       {event.to_agent_name}", flush=True)
+                to = event.to_agent_name or "primary"
+                c  = _agent_colour(to)
+                preview = _preview(event.content)
+                print(f"{_ts()}  {YELLOW}→ DELEGATE{RESET}  to {c}{to}{RESET}  {DIM}{preview}{RESET}", flush=True)
+
+            elif t == "agent.thread_message_received":
+                frm = event.from_agent_name or "primary"
+                c   = _agent_colour(frm)
+                preview = _preview(event.content)
+                print(f"{_ts()}  {GREEN}← REPLY{RESET}     from {c}{frm}{RESET}  {DIM}{preview}{RESET}", flush=True)
+
+            # ── Thinking ────────────────────────────────────────────────
+            elif t == "agent.thinking":
+                # Don't flood — just tick a dot per burst
+                key = "thinking"
+                thinking_count[key] = thinking_count.get(key, 0) + 1
+                if thinking_count[key] == 1:
+                    print(f"{_ts()}  {MAGENTA}💭 THINKING{RESET} ", end="", flush=True)
+                else:
+                    print(".", end="", flush=True)
+
+            # ── Tool use ────────────────────────────────────────────────
+            elif t == "agent.tool_use":
+                if thinking_count.pop("thinking", 0):
+                    print()  # close the thinking dots line
+                name_str = event.name
+                summary  = _tool_summary(name_str, event.input)
+                print(f"\n{_ts()}  {CYAN}⚙  TOOL{RESET}    {BOLD}{name_str}{RESET}  {summary}", flush=True)
+
+            elif t == "agent.mcp_tool_use":
+                if thinking_count.pop("thinking", 0):
+                    print()
+                name_str = f"{event.mcp_server_name}.{event.name}"
+                summary  = _tool_summary(event.name, event.input)
+                print(f"\n{_ts()}  {CYAN}⚙  MCP{RESET}     {BOLD}{name_str}{RESET}  {summary}", flush=True)
+
+            elif t == "agent.tool_result":
+                is_err = getattr(event, "is_error", False)
+                marker = f"{RED}✗ ERROR{RESET}" if is_err else f"{GREEN}✓ done{RESET}"
+                preview = _preview(event.content or [])
+                print(f"{_ts()}       {marker}  {DIM}{preview}{RESET}", flush=True)
+
+            elif t == "agent.mcp_tool_result":
+                is_err = getattr(event, "is_error", False)
+                marker = f"{RED}✗ ERROR{RESET}" if is_err else f"{GREEN}✓ done{RESET}"
+                preview = _preview(getattr(event, "content", []) or [])
+                print(f"{_ts()}       {marker}  {DIM}{preview}{RESET}", flush=True)
+
+            # ── Final coordinator message ────────────────────────────────
             elif t == "agent.message":
+                if thinking_count.pop("thinking", 0):
+                    print()
+                print(f"\n{BOLD}{'─'*60}{RESET}")
+                print(f"{BOLD}  COORDINATOR RESPONSE{RESET}")
+                print(f"{BOLD}{'─'*60}{RESET}\n")
                 for block in event.content:
                     if getattr(block, "type", None) == "text":
                         final_text_parts.append(block.text)
                         print(block.text, end="", flush=True)
-            elif t == "agent.tool_use":
-                print(f"\n  [tool: {getattr(event, 'name', '?')}]", flush=True)
+
+            # ── Session done ─────────────────────────────────────────────
             elif t == "session.status_idle":
-                print("\n\n[swarm finished]")
+                print(f"\n\n{BOLD}{GREEN}✔  SWARM COMPLETE{RESET}", flush=True)
                 break
+
+            elif t == "session.error":
+                print(f"\n{RED}{BOLD}✗  ERROR: {getattr(event, 'message', event)}{RESET}", flush=True)
 
     OUTPUT_DIR.mkdir(exist_ok=True)
     transcript_path = OUTPUT_DIR / "coordinator-transcript.txt"
