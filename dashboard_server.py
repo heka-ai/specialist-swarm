@@ -37,6 +37,37 @@ SUPPORTING_FILES = [
 OUTPUT_DIR = Path("outputs")
 
 
+def _extract_text_snippet(event, max_chars: int = 280) -> str | None:
+    """Pull the first text block out of a message event, if present.
+
+    The event shape varies across SDK versions; be defensive.
+    """
+    content = getattr(event, "content", None)
+    if not content:
+        message = getattr(event, "message", None)
+        content = getattr(message, "content", None) if message else None
+    if not content:
+        return None
+    for block in content:
+        text = getattr(block, "text", None)
+        if text:
+            text = text.strip()
+            return text[:max_chars] + ("…" if len(text) > max_chars else "")
+    return None
+
+
+def _extract_verdict(snippet: str) -> str | None:
+    """Find a 'VERDICT: ACCEPT/REJECT/COUNTER' line in a voter's reply."""
+    for line in snippet.splitlines():
+        line = line.strip().upper()
+        if line.startswith("VERDICT:"):
+            tail = line.split(":", 1)[1].strip()
+            for word in ("ACCEPT", "REJECT", "COUNTER"):
+                if word in tail:
+                    return word
+    return None
+
+
 def load_inputs_as_context() -> str:
     """Load RFP and supporting documents as context."""
     blocks = []
@@ -125,6 +156,14 @@ def run_swarm():
 
                 elif t == "agent.thread_message_received":
                     event_data["from_agent_name"] = event.from_agent_name
+                    # Capture a short verdict snippet from voting panel replies
+                    # so the dashboard can show each voter's call inline.
+                    snippet = _extract_text_snippet(event)
+                    if snippet:
+                        event_data["snippet"] = snippet
+                        verdict = _extract_verdict(snippet)
+                        if verdict:
+                            event_data["verdict"] = verdict
                     print(f"  [reply ←]          {event.from_agent_name}", flush=True)
 
                 elif t == "agent.thread_message_sent":
